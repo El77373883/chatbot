@@ -5,32 +5,34 @@
 <title>Adrian AI</title>
 
 <style>
+
 body{
 margin:0;
 height:100vh;
 display:flex;
 align-items:center;
 justify-content:center;
-background:linear-gradient(135deg,#0f172a,#020617);
+background:#0f172a;
 font-family:Arial, Helvetica, sans-serif;
 color:white;
+overflow:hidden;
 }
 
 .container{
-width:420px;
-height:620px;
+width:430px;
+height:640px;
 background:#020617;
 border-radius:15px;
 box-shadow:0 0 40px rgba(0,0,0,0.6);
 display:flex;
 flex-direction:column;
-overflow:hidden;
+position:fixed;
 }
 
 .header{
-padding:20px;
+padding:18px;
 text-align:center;
-font-size:24px;
+font-size:22px;
 font-weight:bold;
 border-bottom:1px solid #1e293b;
 }
@@ -46,6 +48,7 @@ padding:12px 15px;
 margin:10px 0;
 border-radius:10px;
 max-width:75%;
+word-wrap:break-word;
 }
 
 .user{
@@ -61,11 +64,12 @@ background:#1e293b;
 display:flex;
 padding:10px;
 border-top:1px solid #1e293b;
+gap:5px;
 }
 
 input{
 flex:1;
-padding:12px;
+padding:10px;
 border-radius:8px;
 border:none;
 outline:none;
@@ -74,19 +78,28 @@ color:white;
 }
 
 button{
-margin-left:10px;
-padding:12px 20px;
+padding:10px 14px;
 border:none;
 border-radius:8px;
 background:#2563eb;
 color:white;
 cursor:pointer;
-font-weight:bold;
 }
 
 button:hover{
 background:#1d4ed8;
 }
+
+.upload{
+background:#334155;
+}
+
+img.preview{
+max-width:150px;
+border-radius:8px;
+margin-top:5px;
+}
+
 </style>
 </head>
 
@@ -94,15 +107,24 @@ background:#1d4ed8;
 
 <div class="container">
 
-<div class="header">Adrian AI</div>
+<div class="header">
+🐉 Adrian AI
+</div>
 
 <div id="chat" class="chat">
-<div class="message bot">Hola 👋 soy Adrian AI. Pregúntame algo.</div>
+<div class="message bot">Hola 👋 soy Adrian AI.</div>
 </div>
 
 <div class="input-area">
+
 <input id="msg" placeholder="Escribe tu mensaje...">
+
+<input type="file" id="fileInput" style="display:none" onchange="uploadFile()">
+
+<button class="upload" onclick="document.getElementById('fileInput').click()">📎</button>
+
 <button onclick="send()">Enviar</button>
+
 </div>
 
 </div>
@@ -125,25 +147,40 @@ chat.appendChild(user)
 
 let bot=document.createElement("div")
 bot.className="message bot"
-
-let text=msg.toLowerCase()
-
-if(text.includes("hola")){
-bot.innerText="Hola 👋 ¿cómo estás?"
-}
-else if(text.includes("quien eres")){
-bot.innerText="Soy Adrian AI, tu asistente."
-}
-else if(text.includes("adios")){
-bot.innerText="Hasta luego 👋"
-}
-else{
-bot.innerText="Todavía estoy aprendiendo."
-}
-
+bot.innerText="Estoy aprendiendo todavía."
 chat.appendChild(bot)
 
 input.value=""
+
+chat.scrollTop=chat.scrollHeight
+
+}
+
+function uploadFile(){
+
+let file=document.getElementById("fileInput").files[0]
+if(!file) return
+
+let chat=document.getElementById("chat")
+
+let user=document.createElement("div")
+user.className="message user"
+
+if(file.type.startsWith("image")){
+
+let img=document.createElement("img")
+img.src=URL.createObjectURL(file)
+img.className="preview"
+
+user.appendChild(img)
+
+}else{
+
+user.innerText="📄 Archivo: "+file.name
+
+}
+
+chat.appendChild(user)
 
 chat.scrollTop=chat.scrollHeight
 
