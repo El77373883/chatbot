@@ -23,6 +23,11 @@
             100% { background-position: 0% 50%; }
         }
 
+        @keyframes floatParticles {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
         body { 
             background: var(--bg); 
             background-image: radial-gradient(circle at top right, #1e1b4b, transparent), 
@@ -32,6 +37,25 @@
             color: var(--text); 
             margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
             transition: all 0.5s ease;
+            position: relative;
+        }
+
+        /* Partículas de fondo */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatParticles 10s linear infinite;
         }
 
         body.hacker { --primary: #00ff41; background: #000; }
@@ -47,7 +71,6 @@
         .brand { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; cursor: pointer; }
         .brand span { color: var(--primary); }
 
-        /* Menú hamburguesa */
         .menu-btn {
             background: none;
             border: none;
@@ -176,9 +199,29 @@
 
         @keyframes colorFlow { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
 
-        .bubble { max-width: 85%; padding: 16px 20px; border-radius: 22px; font-size: 15px; line-height: 1.6; animation: slideUp 0.4s ease; position: relative; }
-        .bot { background: var(--glass); align-self: flex-start; border: 1px solid var(--border); border-bottom-left-radius: 4px; }
-        .user { background: linear-gradient(135deg, #6366f1, #4338ca); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
+        .bubble {
+            max-width: 85%;
+            padding: 16px 20px;
+            border-radius: 22px;
+            font-size: 15px;
+            line-height: 1.6;
+            animation: slideUp 0.4s ease;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .bot {
+            background: var(--glass);
+            align-self: flex-start;
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .user {
+            background: linear-gradient(135deg, #6366f1, #4338ca);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
 
         .premium-loader {
             width: 24px; height: 24px;
@@ -197,13 +240,64 @@
             backdrop-filter: blur(20px); z-index: 100;
         }
 
-        .input-container { 
-            background: rgba(0, 0, 0, 0.4); border-radius: 28px; display: flex; 
-            padding: 6px 6px 6px 20px; align-items: center; border: 1px solid var(--border);
+        .model-chips {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 0 10px 10px 10px;
+            margin-bottom: 10px;
+            scrollbar-width: none;
+        }
+        .model-chips::-webkit-scrollbar { display: none; }
+        .model-chip {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: #94a3b8;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
+        .model-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .input-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 28px;
+            display: flex;
+            padding: 6px 6px 6px 20px;
+            align-items: center;
+            border: 1px solid var(--border);
             margin: 0 10px;
         }
         input { flex: 1; background: transparent; border: none; color: white; padding: 12px 0; font-size: 16px; outline: none; }
-        .send-btn { background: var(--primary); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .send-btn, .file-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-left: 5px;
+        }
+        .file-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
+        }
+        .file-btn:hover { background: var(--primary); }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } }
         
@@ -214,7 +308,6 @@
             font-family: monospace;
         }
 
-        /* Footer con el creador */
         .footer-creator {
             text-align: center;
             font-size: 10px;
@@ -232,6 +325,8 @@
 </head>
 <body>
 
+<div class="particles" id="particles"></div>
+
 <header>
     <div style="display: flex; align-items: center; gap: 12px;">
         <button class="menu-btn" id="menuBtn">☰</button>
@@ -245,7 +340,6 @@
 <!-- Sidebar -->
 <div id="sidebar" class="sidebar">
     <button class="close-btn" id="closeSidebar">✖ Cerrar</button>
-    
     <div>
         <h3>📌 Modelos</h3>
         <ul id="modelListSide" class="model-list-side"></ul>
@@ -254,7 +348,6 @@
             <button id="addModelBtn">+ Agregar</button>
         </div>
     </div>
-
     <div>
         <h3>💬 Conversaciones</h3>
         <div class="conv-actions">
@@ -273,11 +366,11 @@
 <div id="chat-window"></div>
 
 <div class="bottom-controls">
+    <div class="model-chips" id="modelChips"></div>
     <div class="input-container">
         <input type="text" id="user-input" placeholder="Escribe un mensaje..." autocomplete="off">
-        <button class="send-btn" onclick="handleSend()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
-        </button>
+        <button class="file-btn" id="fileUploadBtn" title="Subir archivo">📎</button>
+        <button class="send-btn" onclick="handleSend()">➤</button>
     </div>
 </div>
 
@@ -290,24 +383,45 @@
 window.NexusDatabase = {
     categorias: {
         saludos: {
-            claves: ["hola", "buenas", "saludos", "hey", "que tal", "hello", "holi", "buen dia", "buenas tardes", "buenas noches"],
+            claves: ["hola", "buenas", "saludos", "hey", "que tal", "hello", "holi", "buen dia", "buenas tardes", "buenas noches", "como estas", "cómo estás", "que onda"],
             respuestas: {
                 manana: [
                     "¡Buenos días! ☀️ ¿En qué puedo ayudarte?",
                     "¡Excelente mañana! ¿Qué necesitas procesar? 🚀",
-                    "Buen día, comandante. Todo listo para trabajar"
+                    "Buen día, comandante. Todo listo para trabajar",
+                    "¡Hola! ¿Cómo amaneciste? Estoy aquí para ti."
                 ],
                 tarde: [
                     "¡Buenas tardes! 🌤️ ¿Cómo va tu día?",
                     "Tarde productiva, ¿en qué te ayudo?",
-                    "Buenas tardes, sistema al 100%"
+                    "Buenas tardes, sistema al 100%",
+                    "¡Hola! Espero que estés teniendo una gran tarde."
                 ],
                 noche: [
                     "¡Buenas noches! 🌙 Descansa, yo trabajo por ti",
                     "Noche activa, ¿qué deseas consultar?",
-                    "Buenas noches, listo para asistirte"
+                    "Buenas noches, listo para asistirte",
+                    "¡Hola! ¿Todo bien? Estoy aquí cuando me necesites."
                 ]
             }
+        },
+        programacion: {
+            claves: ["javascript", "python", "java", "c++", "programacion", "codigo", "funcion", "variable", "html", "css"],
+            respuestas: [
+                "💻 **Programación**: JavaScript es un lenguaje versátil. ¿Quieres saber sobre variables, funciones o async?",
+                "🐍 Python es ideal para IA y ciencia de datos. ¿Necesitas ayuda con algún concepto?",
+                "🌐 HTML y CSS son la base del frontend. ¿Quieres crear una página web?",
+                "⚙️ En programación, la lógica es clave. ¿Tienes un problema específico?"
+            ]
+        },
+        matematicas: {
+            claves: ["matematica", "matemáticas", "algebra", "calculo", "ecuacion", "suma", "resta", "multiplicacion", "division", "raiz"],
+            respuestas: [
+                "📐 **Matemáticas**: ¿Necesitas resolver una ecuación? Dámela y te ayudo.",
+                "🧮 El álgebra lineal es fundamental para IA. ¿Quieres aprender algo en particular?",
+                "➕ Suma, resta, multiplicación, división... dime qué operación necesitas.",
+                "📊 ¿Cálculo diferencial? Te explico derivadas e integrales paso a paso."
+            ]
         },
         minecraft: {
             claves: ["minecraft", "diamante", "nether", "ender", "crafteo", "bloque", "pico"],
@@ -338,25 +452,25 @@ window.NexusDatabase = {
         creador: {
             claves: ["quien eres", "que eres", "creador", "quien te creo", "que puedes hacer"],
             respuestas: [
-                "🤖 Soy NexusCore, creado por **soyadrianyt001**. Estoy aquí para ayudarte",
-                "⚡ Mi creador es soyadrianyt001, un desarrollador experto en IA",
-                "💬 Puedo saludarte, responder preguntas de juegos y cambiar mi estilo visual"
+                "🤖 Soy NexusCore, creado por **soyadrianyt001**. Estoy aquí para ayudarte con programación, matemáticas, juegos y más.",
+                "⚡ Mi creador es soyadrianyt001, un desarrollador experto en IA. ¿Necesitas algo específico?",
+                "💬 Puedo saludarte, responder preguntas de programación, matemáticas, juegos y cambiar mi estilo visual."
             ]
         },
         ayuda: {
             claves: ["ayuda", "comandos", "que hacer", "como usar"],
             respuestas: [
-                "📌 **Comandos disponibles:**\n• 'hola' - Saludo\n• 'minecraft' - Info del juego\n• 'roblox' - Info de Roblox\n• 'modo hacker' - Cambia el tema\n• 'modo epico' - Tema épico\n• 'normal' - Volver al tema original",
-                "🆘 Escribe 'hola' para saludar, o pregúntame sobre Minecraft, Roblox o Free Fire. También puedes cambiar el tema visual con 'modo hacker' o 'modo epico'"
+                "📌 **Comandos disponibles:**\n• 'hola' - Saludo personalizado\n• 'programación' - Info de programación\n• 'matemáticas' - Ayuda con cálculos\n• 'modo hacker' - Cambia el tema\n• 'modo epico' - Tema épico\n• 'normal' - Volver al tema original\n• También puedes subir archivos de texto o código para analizarlos.",
+                "🆘 Escribe 'hola', pregúntame sobre programación, matemáticas o juegos. Usa 'modo hacker' para un estilo único."
             ]
         }
     },
     default: [
         "Interesante... cuéntame más 🧠",
-        "No tengo información de eso aún. Pregúntame sobre juegos o usa 'ayuda'",
+        "No tengo información de eso aún. Pregúntame sobre programación, matemáticas o usa 'ayuda'.",
         "Procesando... ¿Puedes repetir?",
-        "Soy NexusCore, pregúntame sobre juegos o usa 'hola' para saludar",
-        "No entiendo esa consulta. Escribe 'ayuda' para ver qué puedo hacer"
+        "Soy NexusCore, pregúntame sobre código, mates o juegos. Escribe 'ayuda' para más opciones.",
+        "No entiendo esa consulta. Escribe 'ayuda' para ver qué puedo hacer."
     ]
 };
 
@@ -412,8 +526,10 @@ const NexusBrain = {
             respuestaFinal = db.default[Math.floor(Math.random() * db.default.length)];
         }
 
+        // 3. Agregar información del modelo (efecto profesional)
+        var modelHeader = "<strong style='color: var(--primary);'>[" + modelId.toUpperCase() + "]</strong><br><br>";
         return {
-            text: "<strong style='color: var(--primary);'>[" + modelId.toUpperCase() + "]</strong><br><br>" + respuestaFinal,
+            text: modelHeader + respuestaFinal,
             action: colorModo
         };
     }
@@ -431,10 +547,9 @@ let modelos = [
     "CyberVision 2.0"
 ];
 
-// Conversaciones: { id, title, messages: [{role, content, html?}] }
 let conversations = [];
 let currentConvId = null;
-let currentMessages = []; // array de {role, content}
+let currentMessages = [];
 
 // Cargar datos guardados
 function loadStorage() {
@@ -444,7 +559,6 @@ function loadStorage() {
     const savedConvs = localStorage.getItem('nexus_conversations');
     if (savedConvs) {
         conversations = JSON.parse(savedConvs);
-        // Restaurar última conversación activa
         const lastId = localStorage.getItem('nexus_current_conv');
         if (lastId && conversations.find(c => c.id === lastId)) {
             currentConvId = lastId;
@@ -463,6 +577,7 @@ function loadStorage() {
         else currentMessages = [];
     }
     renderModelsSide();
+    renderModelChips();
     renderConversationsList();
     renderChatFromMessages();
 }
@@ -489,7 +604,6 @@ function newConversation(title = null) {
     renderChatFromMessages();
     renderConversationsList();
     saveConversations();
-    // Ocultar bienvenida si hay mensajes? pero está vacío, mostramos bienvenida
     const welcome = document.getElementById('big-welcome');
     if (welcome) welcome.style.display = 'flex';
 }
@@ -499,9 +613,7 @@ function saveCurrentConversation() {
     const index = conversations.findIndex(c => c.id === currentConvId);
     if (index !== -1) {
         conversations[index].messages = [...currentMessages];
-        // Actualizar título si es el primero y no tiene título personalizado
         if (conversations[index].title === `Chat ${new Date(parseInt(currentConvId)).toLocaleString()}` && currentMessages.length > 0) {
-            // Tomar primer mensaje como título
             const firstUserMsg = currentMessages.find(m => m.role === 'user');
             if (firstUserMsg) {
                 let newTitle = firstUserMsg.content.slice(0, 30);
@@ -547,7 +659,6 @@ function deleteConversation(id) {
 function addMessageToCurrent(role, content) {
     currentMessages.push({ role, content });
     saveCurrentConversation();
-    // Si es el primer mensaje y la conversación no tiene título personalizado, actualizar título
     const conv = conversations.find(c => c.id === currentConvId);
     if (conv && conv.title.startsWith('Chat ') && currentMessages.length === 1 && role === 'user') {
         let newTitle = content.slice(0, 30);
@@ -568,9 +679,26 @@ function renderModelsSide() {
         li.onclick = () => {
             activeModel = model;
             renderModelsSide();
-            // Opcional: mostrar notificación
+            renderModelChips();
         };
         container.appendChild(li);
+    });
+}
+
+function renderModelChips() {
+    const container = document.getElementById('modelChips');
+    if (!container) return;
+    container.innerHTML = '';
+    modelos.forEach(model => {
+        const chip = document.createElement('div');
+        chip.className = `model-chip ${model === activeModel ? 'active' : ''}`;
+        chip.innerText = model;
+        chip.onclick = () => {
+            activeModel = model;
+            renderModelsSide();
+            renderModelChips();
+        };
+        container.appendChild(chip);
     });
 }
 
@@ -580,10 +708,10 @@ function addModel(name) {
         modelos.push(name.trim());
         saveModels();
         renderModelsSide();
+        renderModelChips();
     }
 }
 
-// Renderizar chat desde currentMessages
 function renderChatFromMessages() {
     const chatWindow = document.getElementById('chat-window');
     if (!chatWindow) return;
@@ -654,7 +782,6 @@ function addMessageToUI(role, content, save = true) {
     const div = document.createElement('div');
     div.className = `bubble ${role}`;
     if (role === 'bot') {
-        // Efecto máquina de escribir
         let i = 0;
         const speed = 10;
         div.innerHTML = "";
@@ -707,7 +834,6 @@ function handleSend() {
     const welcome = document.getElementById('big-welcome');
     if(welcome) welcome.style.display = 'none';
 
-    // Mostrar mensaje de usuario inmediatamente
     addMessageToUI('user', text, true);
     input.value = '';
     
@@ -733,8 +859,52 @@ function handleSend() {
     }, 300);
 }
 
-// Inicialización y eventos
+// Subida de archivos
+function uploadFile() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.txt,.js,.py,.html,.css,.json,.md';
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const content = ev.target.result;
+            const userMessage = `📎 Archivo subido: **${file.name}**\n\`\`\`\n${content.slice(0, 1500)}${content.length > 1500 ? '\n... (truncado)' : ''}\n\`\`\``;
+            addMessageToUI('user', userMessage, true);
+            // Procesar el contenido (opcional: enviar al bot)
+            const loadingId = showLoading();
+            setTimeout(() => {
+                const botResponse = `✅ He recibido el archivo **${file.name}**. Contiene ${content.length} caracteres. ¿Quieres que analice algo en específico?`;
+                removeLoading(loadingId);
+                addMessageToUI('bot', botResponse, true);
+            }, 300);
+        };
+        reader.readAsText(file, 'UTF-8');
+    };
+    input.click();
+}
+
+// Partículas animadas
+function initParticles() {
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        const size = Math.random() * 4 + 2;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.bottom = `-10px`;
+        particle.style.animationDelay = `${Math.random() * 10}s`;
+        particle.style.animationDuration = `${Math.random() * 8 + 5}s`;
+        container.appendChild(particle);
+    }
+}
+
+// Inicialización
 window.onload = () => {
+    initParticles();
     setGreeting();
     loadStorage();
     
@@ -757,6 +927,7 @@ window.onload = () => {
     };
     document.getElementById('newConvBtn').onclick = () => newConversation();
     document.getElementById('saveCurrentConvBtn').onclick = () => saveCurrentConversation();
+    document.getElementById('fileUploadBtn').onclick = () => uploadFile();
     
     document.getElementById('user-input').addEventListener('keypress', (e) => {
         if(e.key === 'Enter') handleSend();
