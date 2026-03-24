@@ -2,51 +2,48 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Adrian AI</title>
 
 <style>
 
 body{
 margin:0;
-height:100vh;
 background:#0f172a;
-font-family:Arial, Helvetica, sans-serif;
+font-family:Arial;
 color:white;
 display:flex;
 justify-content:center;
 align-items:center;
+height:100vh;
 }
 
 .container{
-width:100%;
-max-width:700px;
-height:100vh;
+width:500px;
+height:600px;
 background:#020617;
+border-radius:12px;
 display:flex;
 flex-direction:column;
 }
 
 .header{
-padding:18px;
+padding:15px;
 text-align:center;
-font-size:24px;
-font-weight:bold;
+font-size:22px;
 border-bottom:1px solid #1e293b;
 }
 
 .chat{
 flex:1;
-padding:20px;
-overflow-y:auto;
+overflow:auto;
+padding:15px;
 }
 
 .message{
-padding:12px 15px;
-margin:10px 0;
-border-radius:10px;
-max-width:75%;
-word-wrap:break-word;
+padding:10px;
+margin:6px 0;
+border-radius:8px;
+max-width:70%;
 }
 
 .user{
@@ -58,45 +55,29 @@ margin-left:auto;
 background:#1e293b;
 }
 
-.input-area{
+.input{
 display:flex;
-padding:10px;
 border-top:1px solid #1e293b;
-gap:8px;
 }
 
 input{
 flex:1;
 padding:12px;
-border-radius:8px;
 border:none;
-outline:none;
 background:#0f172a;
 color:white;
-font-size:16px;
 }
 
 button{
-padding:12px 16px;
-border:none;
-border-radius:8px;
+padding:12px;
 background:#2563eb;
+border:none;
 color:white;
 cursor:pointer;
-font-size:16px;
-}
-
-.upload{
-background:#334155;
-}
-
-img.preview{
-max-width:200px;
-border-radius:8px;
-margin-top:5px;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -107,75 +88,43 @@ margin-top:5px;
 🐉 Adrian AI
 </div>
 
-<div id="chat" class="chat">
-<div class="message bot">Hola 👋 soy Adrian AI. ¿En qué puedo ayudarte?</div>
-</div>
+<div id="chat" class="chat"></div>
 
-<div class="input-area">
-
-<input id="msg" placeholder="Escribe tu mensaje...">
-
-<input type="file" id="fileInput" style="display:none" onchange="uploadFile()">
-
-<button class="upload" onclick="document.getElementById('fileInput').click()">📎</button>
-
+<div class="input">
+<input id="msg" placeholder="Escribe un mensaje">
 <button onclick="send()">Enviar</button>
-
 </div>
 
 </div>
 
 <script>
 
-function send(){
+async function send(){
 
-let input=document.getElementById("msg")
-let msg=input.value
-
-if(msg==="") return
+let text=document.getElementById("msg").value
+if(!text) return
 
 let chat=document.getElementById("chat")
 
 let user=document.createElement("div")
 user.className="message user"
-user.innerText=msg
+user.innerText=text
 chat.appendChild(user)
+
+let res=await fetch("/chat",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({message:text})
+})
+
+let data=await res.json()
 
 let bot=document.createElement("div")
 bot.className="message bot"
-bot.innerText="Estoy aprendiendo todavía."
-
+bot.innerText=data.reply
 chat.appendChild(bot)
 
-input.value=""
-chat.scrollTop=chat.scrollHeight
-
-}
-
-function uploadFile(){
-
-let file=document.getElementById("fileInput").files[0]
-if(!file) return
-
-let chat=document.getElementById("chat")
-
-let user=document.createElement("div")
-user.className="message user"
-
-if(file.type.startsWith("image")){
-
-let img=document.createElement("img")
-img.src=URL.createObjectURL(file)
-img.className="preview"
-user.appendChild(img)
-
-}else{
-
-user.innerText="📄 Archivo: "+file.name
-
-}
-
-chat.appendChild(user)
+document.getElementById("msg").value=""
 chat.scrollTop=chat.scrollHeight
 
 }
