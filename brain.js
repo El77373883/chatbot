@@ -1,29 +1,17 @@
 const NexusBrain = {
-    // Dividimos el token para evitar el bloqueo automático de seguridad de GitHub
-    P1: "hf_VvXpLzWqOubYnKx",
-    P2: "RjZkNycMvTfGhJxSxDk",
-    
-    // Endpoints gratuitos de Hugging Face
-    MODELS: {
-        PROGRAMMING: "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-Coder-32B-Instruct",
-        MATH: "https://api-inference.huggingface.co/models/mistralai/Mathstral-7B-v0.1",
-        CHAT: "https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct"
-    },
-
     async analyze(input, modelId) {
         const msg = input.toLowerCase().trim();
         const db = window.NexusDatabase;
-        const FULL_TOKEN = this.P1 + this.P2;
         let response = "";
         let action = "none";
-        let usedModel = "DATABASE LOCAL";
+        let moduleUsed = "NEXUS CORE";
 
-        // 1. MODOS VISUALES (Cambio de interfaz)
+        // 1. MODOS VISUALES (Inmediato)
         if (msg.includes("hacker") || msg.includes("matrix")) action = "hacker";
         else if (msg.includes("epico") || msg.includes("fuego")) action = "epico";
         else if (msg.includes("normal") || msg.includes("original") || msg.includes("resetear")) action = "normal";
 
-        // 2. DETECCIÓN DE SALUDOS (Prioridad: Instantáneo)
+        // 2. BUSCAR EN TU BASE DE DATOS (Saludos y Minecraft - Rapidez total)
         const hora = new Date().getHours();
         let momento = (hora >= 6 && hora < 12) ? "manana" : (hora >= 12 && hora < 19) ? "tarde" : "noche";
         
@@ -32,71 +20,63 @@ const NexusBrain = {
         if (esSaludo) {
             const lista = db.categorias.saludos.respuestas[momento];
             response = lista[Math.floor(Math.random() * lista.length)];
+            moduleUsed = "SALUDOS LOCAL";
         } else {
-            // Buscar otras categorías locales (Minecraft, etc.)
+            // Revisar otras categorías (Minecraft, etc.)
             for (let cat in db.categorias) {
                 if (db.categorias[cat].claves.some(clave => msg.includes(clave))) {
                     response = db.categorias[cat].respuestas[Math.floor(Math.random() * db.categorias[cat].respuestas.length)];
+                    moduleUsed = cat.toUpperCase();
                     break;
                 }
             }
         }
 
-        // 3. IA MULTIMODAL (Si no hay respuesta local)
+        // 3. IA DE RESPUESTA LIBRE (Si no está en la DB local)
+        // Usamos un motor de respuesta abierta que NO requiere TOKEN (Gratis e ilimitado)
         if (!response) {
-            let selectedEndpoint = this.MODELS.CHAT;
-            
-            // Lógica para elegir el cerebro adecuado
-            if (msg.match(/[0-9]|cuanto es|calcula|raiz|seno|coseno|\+|\-|\*|\//)) {
-                selectedEndpoint = this.MODELS.MATH;
-                usedModel = "MATH CORE";
-            } else if (msg.match(/codigo|script|programame|html|css|javascript|python|error|java/)) {
-                selectedEndpoint = this.MODELS.PROGRAMMING;
-                usedModel = "CODER ENGINE";
-            } else {
-                usedModel = "CHAT NEURAL";
-            }
-
+            moduleUsed = "EXTERNAL KNOWLEDGE";
             try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 4500); // Espera máx 4.5 seg
+                const proxyUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(input)}&format=json&no_html=1`;
+                const res = await fetch(proxyUrl);
+                const data = await res.json();
 
-                const apiRes = await fetch(selectedEndpoint, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${FULL_TOKEN}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ 
-                        inputs: `Responde breve y en español como Nexus AI: ${input}`,
-                        parameters: { max_new_tokens: 250 }
-                    }),
-                    signal: controller.signal
-                });
-
-                const data = await apiRes.json();
-                clearTimeout(timeoutId);
-
-                if (data && data[0] && data[0].generated_text) {
-                    // Limpieza de respuesta para que no repita la instrucción
-                    response = data[0].generated_text.replace(/.*nexus ai:/gi, "").trim();
+                if (data.AbstractText) {
+                    response = data.AbstractText;
+                } else if (data.Definition) {
+                    response = data.Definition;
+                } else if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+                    response = data.RelatedTopics[0].Text;
                 }
             } catch (e) {
-                console.log("IA ocupada, usando base de datos.");
+                console.warn("Fallo de red externa.");
             }
         }
 
-        // 4. FALLBACK FINAL (Si todo falla)
+        // 4. LÓGICA MATEMÁTICA INTERNA (Gratis y sin API)
+        if (!response && msg.match(/[0-9]/) && msg.match(/[\+\-\*\/]/)) {
+            try {
+                // Limpiamos el texto para dejar solo la operación
+                const operacion = msg.replace(/[^-()\d/*+.]/g, '');
+                const resultado = eval(operacion); // Calculadora nativa
+                response = `Análisis matemático completado: El resultado de **${operacion}** es **${resultado}**.`;
+                moduleUsed = "MATH ENGINE";
+            } catch (e) {
+                response = null;
+            }
+        }
+
+        // 5. RESPUESTA FINAL (Si nada funcionó)
         if (!response) {
             response = db.default[Math.floor(Math.random() * db.default.length)];
         }
 
         // --- DISEÑO PREMIUM ---
-        const tagHeader = `<strong style="color: var(--primary); letter-spacing: 1px;">[${modelId.toUpperCase()}]</strong><br>`;
-        const statusLine = `<span style="font-size: 10px; opacity: 0.6; text-transform: uppercase;">MÓDULO: ${usedModel} • ESTADO: ONLINE</span><br><br>`;
+        const tag = `<strong style="color: var(--primary); letter-spacing: 1px;">[${modelId.toUpperCase()}]</strong><br>`;
+        const status = `<span style="font-size: 10px; opacity: 0.6; text-transform: uppercase;">MÓDULO: ${moduleUsed} • ESTADO: ONLINE</span><br><br>`;
 
         return {
-            text: tagHeader + statusLine + response,
+            text: tag + status + response,
             action: action
         };
     }
