@@ -18,12 +18,18 @@ let msg=req.body.message.toLowerCase()
 
 let reply="Todavía estoy aprendiendo 🤖"
 
-if(msg.includes("hola")){
+if(
+msg.includes("hola") ||
+msg.includes("homa") ||
+msg.includes("ola") ||
+msg.includes("holaa") ||
+msg.includes("buenas")
+){
 reply="Hola 👋 ¿Cómo estás?"
 }
 
 else if(msg.includes("como estas")){
-reply="Estoy bien 😄"
+reply="Estoy muy bien 😄"
 }
 
 else if(msg.includes("que tal")){
@@ -40,11 +46,11 @@ reply=`Aquí tienes un ejemplo:
 
 HTML:
 
-<h1>Hola mundo</h1>
+<h1>Hola Mundo</h1>
 
 JavaScript:
 
-console.log("Hola mundo")
+console.log("Hola Mundo")
 `
 
 }
@@ -61,5 +67,5 @@ res.json({reply:reply})
 })
 
 app.listen(3000,()=>{
-console.log("Adrian AI iniciado")
+console.log("Adrian AI iniciado en puerto 3000")
 })
