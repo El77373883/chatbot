@@ -1,55 +1,65 @@
-const express = require("express");
-const fs = require("fs");
+const express = require("express")
+const fs = require("fs")
 
-const app = express();
-app.use(express.json());
+const app = express()
 
-let memory = [];
+app.use(express.json())
+app.use(express.static("."))
+
+let mensajes=[]
+
+if(fs.existsSync("mensajes.json")){
+mensajes=JSON.parse(fs.readFileSync("mensajes.json"))
+}
 
 app.post("/chat",(req,res)=>{
 
-let msg = req.body.message.toLowerCase();
-let response = "Todavía estoy aprendiendo.";
+let msg=req.body.message.toLowerCase()
+
+let reply="Todavía estoy aprendiendo 🤖"
 
 if(msg.includes("hola")){
-response = "Hola 👋 ¿Cómo estás?";
+reply="Hola 👋 ¿Cómo estás?"
 }
 
 else if(msg.includes("como estas")){
-response = "Estoy bien 😄";
+reply="Estoy bien 😄"
+}
+
+else if(msg.includes("que tal")){
+reply="Todo bien 👍"
 }
 
 else if(msg.includes("quien te creo")){
-response = "Me creó soyadrianyt001";
+reply="Me creó soyadrianyt001"
 }
 
-else if(msg.includes("creame un codigo")){
+else if(msg.includes("crea un codigo")){
 
-response = `Aquí tienes un ejemplo de código:
+reply=`Aquí tienes un ejemplo:
 
-HTML básico:
-
-<html>
-<head>
-<title>Ejemplo</title>
-</head>
-<body>
+HTML:
 
 <h1>Hola mundo</h1>
 
-</body>
-</html>`;
+JavaScript:
+
+console.log("Hola mundo")
+`
 
 }
 
-memory.push({user:msg,bot:response});
+mensajes.push({
+usuario:msg,
+respuesta:reply
+})
 
-fs.writeFileSync("memory.json",JSON.stringify(memory,null,2));
+fs.writeFileSync("mensajes.json",JSON.stringify(mensajes,null,2))
 
-res.json({reply:response});
+res.json({reply:reply})
 
-});
+})
 
 app.listen(3000,()=>{
-console.log("Adrian AI servidor activo");
-});
+console.log("Adrian AI iniciado")
+})
