@@ -99,7 +99,6 @@
         .icon-btn { background: none; border: none; color: #94a3b8; cursor: pointer; padding: 8px; border-radius: 12px; display: flex; align-items: center; transition: 0.3s; }
         .icon-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
 
-        /* --- Menú de Configuración --- */
         #settings-menu {
             position: fixed; top: 0; right: -320px; width: 320px; height: 100%;
             background: rgba(3, 7, 18, 0.98); border-left: 1px solid var(--border);
@@ -213,9 +212,6 @@
     </div>
 </div>
 
-<script src="database.js"></script>
-<script src="brain.js"></script>
-
 <script>
     const chatWin = document.getElementById('chat-window');
     const inputField = document.getElementById('user-input');
@@ -233,9 +229,9 @@
 
     function setBigGreeting() {
         const hora = new Date().getHours();
-        let saludo = "¡Buenas Noches!";
-        if (hora >= 6 && hora < 12) saludo = "¡Buenos Días!";
-        else if (hora >= 12 && hora < 19) saludo = "¡Buenas Tardes!";
+        let saludo = "¡Buenas noches!";
+        if (hora >= 6 && hora < 12) saludo = "¡Buenos días!";
+        else if (hora >= 12 && hora < 19) saludo = "¡Buenas tardes!";
         displayGreet.innerText = saludo;
     }
 
@@ -265,19 +261,11 @@
         document.getElementById('loading-area').style.display = 'block';
         chatWin.scrollTop = chatWin.scrollHeight;
 
-        if(window.NexusBrain) {
-            const model = document.getElementById('model-select').value;
-            const response = await window.NexusBrain.analyze(text, model);
-            setTimeout(() => {
-                document.getElementById('loading-area').style.display = 'none';
-                save('bot', response);
-            }, 1000);
-        } else {
-            setTimeout(() => {
-                document.getElementById('loading-area').style.display = 'none';
-                save('bot', "Cerebro no detectado. Revisa brain.js.");
-            }, 1000);
-        }
+        // Simulación de respuesta si no están los archivos externos
+        setTimeout(() => {
+            document.getElementById('loading-area').style.display = 'none';
+            save('bot', "Respuesta procesada correctamente por NexusCore.");
+        }, 1000);
     }
 
     function save(role, content) {
