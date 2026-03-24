@@ -4,76 +4,67 @@ const NexusBrain = {
         const db = window.NexusDatabase;
         let response = "";
         let action = "none";
-        let moduleUsed = "NEXUS CORE";
+        let moduleUsed = "OFFLINE CORE";
 
-        // 1. MODOS VISUALES (Inmediato)
+        // 1. MODOS VISUALES (Instantáneo)
         if (msg.includes("hacker") || msg.includes("matrix")) action = "hacker";
         else if (msg.includes("epico") || msg.includes("fuego")) action = "epico";
         else if (msg.includes("normal") || msg.includes("original") || msg.includes("resetear")) action = "normal";
 
-        // 2. BUSCAR EN TU BASE DE DATOS (Saludos y Minecraft - Rapidez total)
-        const hora = new Date().getHours();
-        let momento = (hora >= 6 && hora < 12) ? "manana" : (hora >= 12 && hora < 19) ? "tarde" : "noche";
-        
-        const esSaludo = db.categorias.saludos.claves.some(clave => msg.includes(clave));
-        
-        if (esSaludo) {
-            const lista = db.categorias.saludos.respuestas[momento];
-            response = lista[Math.floor(Math.random() * lista.length)];
-            moduleUsed = "SALUDOS LOCAL";
-        } else {
-            // Revisar otras categorías (Minecraft, etc.)
-            for (let cat in db.categorias) {
-                if (db.categorias[cat].claves.some(clave => msg.includes(clave))) {
-                    response = db.categorias[cat].respuestas[Math.floor(Math.random() * db.categorias[cat].respuestas.length)];
-                    moduleUsed = cat.toUpperCase();
-                    break;
-                }
-            }
+        // 2. MOTOR DE TIEMPO (Funciona sin internet)
+        if (msg.includes("hora") || msg.includes("fecha") || msg.includes("dia es")) {
+            const ahora = new Date();
+            const time = ahora.toLocaleTimeString();
+            const date = ahora.toLocaleDateString();
+            response = `Sincronización temporal completada. La hora actual es **${time}** y la fecha es **${date}**.`;
+            moduleUsed = "TIME ENGINE";
         }
 
-        // 3. IA DE RESPUESTA LIBRE (Si no está en la DB local)
-        // Usamos un motor de respuesta abierta que NO requiere TOKEN (Gratis e ilimitado)
-        if (!response) {
-            moduleUsed = "EXTERNAL KNOWLEDGE";
-            try {
-                const proxyUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(input)}&format=json&no_html=1`;
-                const res = await fetch(proxyUrl);
-                const data = await res.json();
-
-                if (data.AbstractText) {
-                    response = data.AbstractText;
-                } else if (data.Definition) {
-                    response = data.Definition;
-                } else if (data.RelatedTopics && data.RelatedTopics.length > 0) {
-                    response = data.RelatedTopics[0].Text;
-                }
-            } catch (e) {
-                console.warn("Fallo de red externa.");
-            }
-        }
-
-        // 4. LÓGICA MATEMÁTICA INTERNA (Gratis y sin API)
+        // 3. MOTOR MATEMÁTICO (Calculadora interna avanzada)
         if (!response && msg.match(/[0-9]/) && msg.match(/[\+\-\*\/]/)) {
             try {
-                // Limpiamos el texto para dejar solo la operación
-                const operacion = msg.replace(/[^-()\d/*+.]/g, '');
-                const resultado = eval(operacion); // Calculadora nativa
-                response = `Análisis matemático completado: El resultado de **${operacion}** es **${resultado}**.`;
-                moduleUsed = "MATH ENGINE";
+                // Extrae solo los números y signos: 2+2, 50*10, etc.
+                const formula = msg.replace(/[^-()\d/*+.]/g, '');
+                if (formula) {
+                    const resultado = Function('"use strict";return (' + formula + ')')();
+                    response = `Cálculo procesado con éxito. El resultado de **${formula}** es **${resultado}**.`;
+                    moduleUsed = "MATH ENGINE";
+                }
             } catch (e) {
-                response = null;
+                response = "Error en la cadena matemática. Revisa los operadores.";
             }
         }
 
-        // 5. RESPUESTA FINAL (Si nada funcionó)
+        // 4. BÚSQUEDA EN DATABASE LOCAL (Saludos y Minecraft)
+        if (!response) {
+            const hora = new Date().getHours();
+            let momento = (hora >= 6 && hora < 12) ? "manana" : (hora >= 12 && hora < 19) ? "tarde" : "noche";
+            
+            const esSaludo = db.categorias.saludos.claves.some(clave => msg.includes(clave));
+            
+            if (esSaludo) {
+                const lista = db.categorias.saludos.respuestas[momento];
+                response = lista[Math.floor(Math.random() * lista.length)];
+                moduleUsed = "LINGUISTIC CORE";
+            } else {
+                for (let cat in db.categorias) {
+                    if (db.categorias[cat].claves.some(clave => msg.includes(clave))) {
+                        response = db.categorias[cat].respuestas[Math.floor(Math.random() * db.categorias[cat].respuestas.length)];
+                        moduleUsed = cat.toUpperCase();
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 5. RESPUESTA POR DEFECTO (Si no entiende)
         if (!response) {
             response = db.default[Math.floor(Math.random() * db.default.length)];
         }
 
         // --- DISEÑO PREMIUM ---
         const tag = `<strong style="color: var(--primary); letter-spacing: 1px;">[${modelId.toUpperCase()}]</strong><br>`;
-        const status = `<span style="font-size: 10px; opacity: 0.6; text-transform: uppercase;">MÓDULO: ${moduleUsed} • ESTADO: ONLINE</span><br><br>`;
+        const status = `<span style="font-size: 10px; opacity: 0.6; text-transform: uppercase;">MÓDULO: ${moduleUsed} • STATUS: ONLINE</span><br><br>`;
 
         return {
             text: tag + status + response,
