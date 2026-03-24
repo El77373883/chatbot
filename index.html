@@ -42,7 +42,6 @@
             position: relative;
         }
 
-        /* Partículas de fondo */
         .particles {
             position: fixed;
             top: 0;
@@ -339,7 +338,6 @@
             font-weight: bold;
         }
 
-        /* Dropdown para modelos */
         .model-dropdown {
             position: fixed;
             bottom: 85px;
@@ -366,6 +364,26 @@
         .model-dropdown div:hover {
             background: var(--primary);
             color: white;
+        }
+
+        /* Botón de descarga */
+        .download-btn {
+            display: inline-block;
+            margin-top: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 24px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+        }
+        .download-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
         }
     </style>
 </head>
@@ -430,7 +448,6 @@
     CREADOR: <span>SOYADRIANYT001</span>
 </div>
 
-<!-- Dropdown flotante para selección de modelos -->
 <div id="modelDropdown" class="model-dropdown"></div>
 
 <script>
@@ -512,8 +529,8 @@ window.NexusDatabase = {
         ayuda: {
             claves: ["ayuda", "comandos", "que hacer", "como usar"],
             respuestas: [
-                "Comandos disponibles: 'hola' (saludo personalizado), 'programación', 'matemáticas', 'modo hacker', 'modo epico', 'normal'. También puedes subir archivos de texto o código.",
-                "Escribe 'hola', pregúntame sobre programación, matemáticas o juegos. Usa 'modo hacker' para un estilo único."
+                "Comandos disponibles: 'hola' (saludo personalizado), 'programación', 'matemáticas', 'modo hacker', 'modo epico', 'normal'. También puedes subir archivos o pedirme que genere un archivo (ej: 'genera un archivo con este código').",
+                "Escribe 'hola', pregúntame sobre programación, matemáticas o juegos. Usa 'modo hacker' para un estilo único. Si quieres un archivo, escribe 'genera un archivo' seguido del contenido."
             ]
         }
     },
@@ -525,7 +542,7 @@ window.NexusDatabase = {
     ]
 };
 
-// ==================== BRAIN.JS ====================
+// ==================== BRAIN.JS con generación de archivos ====================
 const NexusBrain = {
     analyze: function(input, modelId) {
         var msg = input.toLowerCase().trim();
@@ -537,22 +554,71 @@ const NexusBrain = {
         if (msg.includes("hacker")) {
             colorModo = "hacker";
             respuestaFinal = "Modo Hacker activado. Interfaz reconfigurada.";
+            return { text: this.formatResponse(modelId, respuestaFinal), action: colorModo };
         } else if (msg.includes("epico")) {
             colorModo = "epico";
             respuestaFinal = "Modo Épico activado. Potencia al máximo.";
+            return { text: this.formatResponse(modelId, respuestaFinal), action: colorModo };
         } else if (msg.includes("normal") || msg.includes("resetear")) {
             colorModo = "normal";
             respuestaFinal = "Modo Normal restaurado. Estilo original.";
+            return { text: this.formatResponse(modelId, respuestaFinal), action: colorModo };
         }
 
-        if (colorModo !== "none") {
-            return {
-                text: `<span style="color: var(--primary); font-weight: 600;">[${modelId.toUpperCase()}]</span><br><br>${respuestaFinal}`,
-                action: colorModo
-            };
+        // 2. GENERACIÓN DE ARCHIVOS (si el usuario lo pide explícitamente)
+        const downloadKeywords = ["genera un archivo", "descargar archivo", "crea un archivo", "dame el código en un archivo", "exporta", "guarda como archivo"];
+        let isDownloadRequest = false;
+        let downloadContent = "";
+        let downloadFilename = "archivo.txt";
+        let downloadMime = "text/plain";
+
+        for (let kw of downloadKeywords) {
+            if (msg.includes(kw)) {
+                isDownloadRequest = true;
+                // Extraer contenido después de la palabra clave
+                let contentStart = input.indexOf(kw) + kw.length;
+                let rawContent = input.substring(contentStart).trim();
+                if (rawContent === "") {
+                    respuestaFinal = "No especificaste el contenido del archivo. Escribe algo como: 'genera un archivo con este código: ...'";
+                } else {
+                    // Intentar detectar extensión por contexto
+                    if (rawContent.includes("function") || rawContent.includes("var") || rawContent.includes("const") || rawContent.includes("console.log")) {
+                        downloadFilename = "codigo.js";
+                        downloadMime = "text/javascript";
+                    } else if (rawContent.includes("<html>") || rawContent.includes("<div>")) {
+                        downloadFilename = "pagina.html";
+                        downloadMime = "text/html";
+                    } else if (rawContent.includes("import") || rawContent.includes("def ")) {
+                        downloadFilename = "script.py";
+                        downloadMime = "text/x-python";
+                    } else {
+                        downloadFilename = "documento.txt";
+                        downloadMime = "text/plain";
+                    }
+                    downloadContent = rawContent;
+                    respuestaFinal = `He preparado el archivo **${downloadFilename}** con el contenido solicitado. Haz clic en el botón para descargarlo.`;
+                }
+                break;
+            }
         }
 
-        // 2. BUSCAR EN DB
+        if (isDownloadRequest) {
+            if (respuestaFinal.includes("No especificaste")) {
+                return { text: this.formatResponse(modelId, respuestaFinal), action: colorModo };
+            } else {
+                return {
+                    text: this.formatResponse(modelId, respuestaFinal),
+                    action: colorModo,
+                    download: {
+                        filename: downloadFilename,
+                        content: downloadContent,
+                        mime: downloadMime
+                    }
+                };
+            }
+        }
+
+        // 3. BÚSQUEDA NORMAL EN DB
         var encontrado = false;
         for (var cat in db.categorias) {
             var categoria = db.categorias[cat];
@@ -577,10 +643,11 @@ const NexusBrain = {
             respuestaFinal = db.default[Math.floor(Math.random() * db.default.length)];
         }
 
-        return {
-            text: `<span style="color: var(--primary); font-weight: 600;">[${modelId.toUpperCase()}]</span><br><br>${respuestaFinal}`,
-            action: colorModo
-        };
+        return { text: this.formatResponse(modelId, respuestaFinal), action: colorModo };
+    },
+
+    formatResponse: function(modelId, text) {
+        return `<span style="color: var(--primary); font-weight: 600;">[${modelId.toUpperCase()}]</span><br><br>${text}`;
     }
 };
 
@@ -705,8 +772,10 @@ function deleteConversation(id) {
     if (welcome && currentMessages.length === 0) welcome.style.display = 'flex';
 }
 
-function addMessageToCurrent(role, content) {
-    currentMessages.push({ role, content });
+function addMessageToCurrent(role, content, downloadInfo = null) {
+    let msgObj = { role, content };
+    if (downloadInfo) msgObj.download = downloadInfo;
+    currentMessages.push(msgObj);
     saveCurrentConversation();
     const conv = conversations.find(c => c.id === currentConvId);
     if (conv && conv.title.startsWith('Chat ') && currentMessages.length === 1 && role === 'user') {
@@ -729,7 +798,6 @@ function renderModelsSide() {
             activeModel = model;
             renderModelsSide();
             updateModelSelectorLabel();
-            // Cerrar dropdown si está abierto
             document.getElementById('modelDropdown').classList.remove('open');
         };
         container.appendChild(li);
@@ -748,6 +816,7 @@ function addModel(name) {
         saveModels();
         renderModelsSide();
         updateModelSelectorLabel();
+        buildModelDropdown();
     }
 }
 
@@ -766,11 +835,16 @@ function renderChatFromMessages() {
     currentMessages.forEach(msg => {
         const div = document.createElement('div');
         div.className = `bubble ${msg.role}`;
-        if (msg.role === 'bot') {
-            div.innerHTML = msg.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
-        } else {
-            div.innerHTML = msg.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        let contentHtml = msg.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
+        if (msg.role === 'bot' && msg.download) {
+            // Crear botón de descarga
+            const blob = new Blob([msg.download.content], { type: msg.download.mime });
+            const url = URL.createObjectURL(blob);
+            contentHtml += `<br><a class="download-btn" href="${url}" download="${msg.download.filename}"><i class="fas fa-download"></i> Descargar ${msg.download.filename}</a>`;
+            // Liberar URL después de un tiempo, pero se mantiene mientras se muestre
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
         }
+        div.innerHTML = contentHtml;
         chatWindow.appendChild(div);
     });
     chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -804,17 +878,7 @@ function renderConversationsList() {
     });
 }
 
-// Funciones de UI y mensajes
-function setGreeting() {
-    const hora = new Date().getHours();
-    let saludo = "¡Buenas noches!";
-    if (hora >= 6 && hora < 12) saludo = "¡Buenos días!";
-    else if (hora >= 12 && hora < 19) saludo = "¡Buenas tardes!";
-    const greetElement = document.getElementById('display-greet');
-    if(greetElement) greetElement.textContent = saludo;
-}
-
-function addMessageToUI(role, content, save = true) {
+function addMessageToUI(role, content, save = true, downloadInfo = null) {
     const win = document.getElementById('chat-window');
     const div = document.createElement('div');
     div.className = `bubble ${role}`;
@@ -833,8 +897,14 @@ function addMessageToUI(role, content, save = true) {
                 setTimeout(typeWriter, speed);
             } else {
                 let finalHtml = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
+                if (downloadInfo) {
+                    const blob = new Blob([downloadInfo.content], { type: downloadInfo.mime });
+                    const url = URL.createObjectURL(blob);
+                    finalHtml += `<br><a class="download-btn" href="${url}" download="${downloadInfo.filename}"><i class="fas fa-download"></i> Descargar ${downloadInfo.filename}</a>`;
+                    setTimeout(() => URL.revokeObjectURL(url), 60000);
+                }
                 div.innerHTML = finalHtml;
-                if (save) addMessageToCurrent(role, content);
+                if (save) addMessageToCurrent(role, content, downloadInfo);
             }
         }
         typeWriter();
@@ -884,7 +954,7 @@ function handleSend() {
                 if(result.action && result.action !== "none") {
                     document.body.className = result.action;
                 }
-                addMessageToUI('bot', result.text, true);
+                addMessageToUI('bot', result.text, true, result.download || null);
             } else {
                 removeLoading(loadingId);
                 addMessageToUI('bot', "Error: Sistema no disponible", true);
@@ -896,7 +966,6 @@ function handleSend() {
     }, 300);
 }
 
-// Subida de archivos
 function uploadFile() {
     const input = document.createElement('input');
     input.type = 'file';
@@ -921,7 +990,6 @@ function uploadFile() {
     input.click();
 }
 
-// Partículas animadas
 function initParticles() {
     const container = document.getElementById('particles');
     for (let i = 0; i < 50; i++) {
@@ -938,7 +1006,6 @@ function initParticles() {
     }
 }
 
-// Dropdown de modelos
 function buildModelDropdown() {
     const dropdown = document.getElementById('modelDropdown');
     dropdown.innerHTML = '';
@@ -955,14 +1022,21 @@ function buildModelDropdown() {
     });
 }
 
-// Inicialización
+function setGreeting() {
+    const hora = new Date().getHours();
+    let saludo = "¡Buenas noches!";
+    if (hora >= 6 && hora < 12) saludo = "¡Buenos días!";
+    else if (hora >= 12 && hora < 19) saludo = "¡Buenas tardes!";
+    const greetElement = document.getElementById('display-greet');
+    if(greetElement) greetElement.textContent = saludo;
+}
+
 window.onload = () => {
     initParticles();
     setGreeting();
     loadStorage();
     buildModelDropdown();
     
-    // Sidebar
     const sidebar = document.getElementById('sidebar');
     const menuBtn = document.getElementById('menuBtn');
     const closeBtn = document.getElementById('closeSidebar');
@@ -978,19 +1052,17 @@ window.onload = () => {
         const input = document.getElementById('newModelName');
         addModel(input.value);
         input.value = '';
-        buildModelDropdown(); // actualizar dropdown
+        buildModelDropdown();
     };
     document.getElementById('newConvBtn').onclick = () => newConversation();
     document.getElementById('saveCurrentConvBtn').onclick = () => saveCurrentConversation();
     document.getElementById('fileUploadBtn').onclick = () => uploadFile();
     
-    // Selector de modelos: toggle dropdown
     const selectorBtn = document.getElementById('modelSelectorBtn');
     const dropdown = document.getElementById('modelDropdown');
     selectorBtn.onclick = (e) => {
         e.stopPropagation();
         dropdown.classList.toggle('open');
-        // Reconstruir dropdown por si se agregaron nuevos modelos
         buildModelDropdown();
     };
     document.addEventListener('click', (e) => {
