@@ -31,22 +31,14 @@
         header { 
             padding: 15px 20px; 
             padding-top: calc(15px + env(safe-area-inset-top));
-            background: var(--glass); 
-            border-bottom: 1px solid var(--border); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            backdrop-filter: blur(15px);
-            z-index: 100;
+            background: var(--glass); border-bottom: 1px solid var(--border); 
+            display: flex; justify-content: space-between; align-items: center; 
+            backdrop-filter: blur(15px); z-index: 100;
         }
 
         .brand { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; }
         .brand span { color: var(--primary); }
-
-        .icon-btn { 
-            background: none; border: none; color: var(--text); 
-            font-size: 20px; cursor: pointer; padding: 5px;
-        }
+        .icon-btn { background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer; padding: 5px; }
 
         /* --- Sidebar de Ajustes --- */
         #settings-menu {
@@ -56,37 +48,20 @@
             padding: 40px 25px; backdrop-filter: blur(25px);
         }
         #settings-menu.open { right: 0; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
-
         .menu-header { font-weight: 700; font-size: 20px; margin-bottom: 30px; display: block; }
         .setting-item { margin-bottom: 25px; }
         .setting-item label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; }
-
-        select { 
-            width: 100%; background: #030712; color: white; border: 1px solid var(--border); 
-            padding: 12px; border-radius: 12px; outline: none; font-size: 14px;
-        }
+        select { width: 100%; background: #030712; color: white; border: 1px solid var(--border); padding: 12px; border-radius: 12px; outline: none; font-size: 14px; }
 
         /* --- Ventana de Chat --- */
-        #chat-window { 
-            flex: 1; overflow-y: auto; padding: 20px; 
-            display: flex; flex-direction: column; gap: 15px;
-            scroll-behavior: smooth;
-        }
-
-        .bubble { 
-            max-width: 85%; padding: 14px 18px; border-radius: 20px; 
-            font-size: 15px; line-height: 1.5; animation: fadeIn 0.3s ease;
-        }
-
+        #chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
+        .bubble { max-width: 85%; padding: 14px 18px; border-radius: 20px; font-size: 15px; line-height: 1.5; animation: fadeIn 0.3s ease; }
         .bot { background: var(--glass); align-self: flex-start; border: 1px solid var(--border); border-bottom-left-radius: 4px; }
         .user { background: var(--primary); align-self: flex-end; border-bottom-right-radius: 4px; }
 
         /* --- Animación "Pensando" --- */
         #loading-area { display: none; padding: 0 20px; margin-bottom: 10px; }
-        .typing-bubble { 
-            display: inline-flex; align-items: center; gap: 5px; 
-            background: var(--glass); padding: 10px 15px; border-radius: 15px; border: 1px solid var(--border);
-        }
+        .typing-bubble { display: inline-flex; align-items: center; gap: 5px; background: var(--glass); padding: 10px 15px; border-radius: 15px; border: 1px solid var(--border); }
         .dot { width: 5px; height: 5px; background: #94a3b8; border-radius: 50%; animation: bounce 1.4s infinite; }
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
@@ -95,26 +70,13 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
 
         /* --- Barra de Entrada Pro --- */
-        .input-area { 
-            background: var(--glass); border-top: 1px solid var(--border);
-            padding: 15px 20px; padding-bottom: calc(15px + env(safe-area-inset-bottom));
-            backdrop-filter: blur(15px);
-        }
-
+        .input-area { background: var(--glass); border-top: 1px solid var(--border); padding: 15px 20px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); backdrop-filter: blur(15px); }
         .toolbar { display: flex; gap: 20px; margin-bottom: 12px; padding-left: 5px; }
         .tool-icon { font-size: 18px; cursor: pointer; transition: 0.2s; }
-        .tool-icon:hover { transform: scale(1.2); }
-
-        .input-container { 
-            background: #030712; border-radius: 30px; display: flex; 
-            padding: 5px 15px; align-items: center; border: 1px solid var(--border);
-        }
-
+        .input-container { background: #030712; border-radius: 30px; display: flex; padding: 5px 15px; align-items: center; border: 1px solid var(--border); }
         input { flex: 1; background: transparent; border: none; color: white; padding: 12px; font-size: 16px; outline: none; }
-        
         .mic-active { color: #ef4444; font-weight: 700; font-size: 10px; margin-right: 10px; display: none; animation: pulse 1s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
         .send-btn { background: var(--primary); color: white; border: none; width: 38px; height: 38px; border-radius: 50%; font-weight: bold; }
     </style>
 </head>
@@ -125,9 +87,9 @@
     <div class="setting-item">
         <label>Motor de Inteligencia</label>
         <select id="model-select">
-            <option value="Nexus-G4">Nexus G4 (Técnico)</option>
+            <option value="Nexus-V3">Nexus V3 (Estable)</option>
+            <option value="Nexus-V5">Nexus V5 (Neural Pro)</option>
             <option value="Claude-V3">Claude V3 (Creativo)</option>
-            <option value="Gemini-Pro">Gemini Pro (Veloz)</option>
         </select>
     </div>
     <div class="setting-item">
@@ -155,13 +117,10 @@
     <div class="toolbar">
         <label for="img-input" class="tool-icon">🖼️</label>
         <input type="file" id="img-input" hidden accept="image/*" onchange="handleMedia('Imagen')">
-        
         <label for="vid-input" class="tool-icon">🎥</label>
         <input type="file" id="vid-input" hidden accept="video/*" onchange="handleMedia('Video')">
-        
         <span class="tool-icon" onclick="toggleMic()">🎤</span>
     </div>
-
     <div class="input-container">
         <span id="mic-status" class="mic-active">● REC</span>
         <input type="text" id="user-input" placeholder="Escribe un mensaje..." autocomplete="off">
@@ -188,17 +147,17 @@
     }
 
     function handleMedia(type) {
-        save('user', `He adjuntado un **${type}** para análisis.`);
+        save('user', `He adjuntado un **${type}**.`);
         loadingArea.style.display = 'block';
         setTimeout(() => {
             loadingArea.style.display = 'none';
-            save('bot', `[SISTEMA VISUAL] He recibido el archivo. El análisis de metadatos no muestra errores de integridad en el ${type}.`);
+            save('bot', `[SISTEMA VISUAL] Archivo ${type} procesado con éxito.`);
         }, 1500);
     }
 
     function render() {
         const history = JSON.parse(localStorage.getItem('nexus_ultra')) || [
-            {role:'bot', content:'Protocolos NexusCore v2.5 activos. Micrófono y Multimedia sincronizados.'}
+            {role:'bot', content:'Protocolos NexusCore activos. ¿Qué motor deseas probar hoy?'}
         ];
         chatWin.innerHTML = '';
         history.forEach(m => {
@@ -213,12 +172,10 @@
     async function handleSend() {
         const text = inputField.value.trim();
         if(!text) return;
-
         save('user', text);
         inputField.value = '';
         loadingArea.style.display = 'block';
         chatWin.scrollTop = chatWin.scrollHeight;
-
         if(window.NexusBrain) {
             const model = document.getElementById('model-select').value;
             const response = await window.NexusBrain.analyze(text, model);
@@ -236,11 +193,7 @@
         render();
     }
 
-    function clearChat() {
-        localStorage.removeItem('nexus_ultra');
-        location.reload();
-    }
-
+    function clearChat() { localStorage.removeItem('nexus_ultra'); location.reload(); }
     inputField.onkeypress = (e) => { if(e.key === 'Enter') handleSend() };
     render();
 </script>
