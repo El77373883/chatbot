@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>NexusCore AI | soyadrianyt001</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 (iconos profesionales) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root { 
             --primary: #6366f1; 
@@ -69,7 +71,7 @@
         }
 
         .brand { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; cursor: pointer; }
-        .brand span { color: var(--primary); }
+        .brand i, .brand span { color: var(--primary); }
 
         .menu-btn {
             background: none;
@@ -187,17 +189,21 @@
             transition: all 0.6s ease;
         }
 
-        .welcome-title {
-            font-size: 38px; font-weight: 700;
-            background: linear-gradient(90deg, #ffffff, #6366f1, #a855f7, #ffffff);
-            background-size: 200% auto;
+        .greeting {
+            font-size: 42px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, var(--primary));
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: colorFlow 6s linear infinite;
-            margin-bottom: 5px; display: block;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 12px;
         }
-
-        @keyframes colorFlow { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+        .subtitle {
+            font-size: 18px;
+            font-weight: 500;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+        }
 
         .bubble {
             max-width: 85%;
@@ -240,45 +246,56 @@
             backdrop-filter: blur(20px); z-index: 100;
         }
 
-        .model-chips {
+        .input-area {
             display: flex;
+            align-items: center;
             gap: 8px;
-            overflow-x: auto;
-            padding: 0 10px 10px 10px;
-            margin-bottom: 10px;
-            scrollbar-width: none;
+            margin: 0 10px;
         }
-        .model-chips::-webkit-scrollbar { display: none; }
-        .model-chip {
-            background: rgba(255,255,255,0.05);
+        .model-selector {
+            background: rgba(0,0,0,0.4);
             border: 1px solid var(--border);
-            color: #94a3b8;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
+            border-radius: 28px;
+            padding: 0 16px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             cursor: pointer;
             transition: 0.3s;
-            white-space: nowrap;
-            text-transform: uppercase;
-        }
-        .model-chip.active {
-            background: var(--primary);
             color: white;
-            border-color: var(--primary);
-            box-shadow: 0 0 15px var(--primary-glow);
         }
-
+        .model-selector:hover {
+            border-color: var(--primary);
+            background: rgba(0,0,0,0.6);
+        }
+        .model-selector i {
+            font-size: 14px;
+            color: var(--primary);
+        }
+        .model-selector span {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
         .input-container {
+            flex: 1;
             background: rgba(0, 0, 0, 0.4);
             border-radius: 28px;
             display: flex;
             padding: 6px 6px 6px 20px;
             align-items: center;
             border: 1px solid var(--border);
-            margin: 0 10px;
         }
-        input { flex: 1; background: transparent; border: none; color: white; padding: 12px 0; font-size: 16px; outline: none; }
+        .input-container input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 12px 0;
+            font-size: 16px;
+            outline: none;
+        }
         .send-btn, .file-btn {
             background: var(--primary);
             color: white;
@@ -321,6 +338,35 @@
             color: var(--primary);
             font-weight: bold;
         }
+
+        /* Dropdown para modelos */
+        .model-dropdown {
+            position: fixed;
+            bottom: 85px;
+            left: 20px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 8px 0;
+            z-index: 150;
+            width: 200px;
+            display: none;
+            flex-direction: column;
+        }
+        .model-dropdown.open {
+            display: flex;
+        }
+        .model-dropdown div {
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 13px;
+        }
+        .model-dropdown div:hover {
+            background: var(--primary);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -329,9 +375,9 @@
 
 <header>
     <div style="display: flex; align-items: center; gap: 12px;">
-        <button class="menu-btn" id="menuBtn">☰</button>
+        <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
         <div class="brand-container">
-            <div class="brand">NEXUS<span>CORE</span></div>
+            <div class="brand"><i class="fas fa-microchip"></i> NEXUS<span>CORE</span></div>
         </div>
     </div>
     <div></div>
@@ -339,44 +385,53 @@
 
 <!-- Sidebar -->
 <div id="sidebar" class="sidebar">
-    <button class="close-btn" id="closeSidebar">✖ Cerrar</button>
+    <button class="close-btn" id="closeSidebar"><i class="fas fa-times"></i> Cerrar</button>
     <div>
-        <h3>📌 Modelos</h3>
+        <h3><i class="fas fa-cubes"></i> Modelos</h3>
         <ul id="modelListSide" class="model-list-side"></ul>
         <div class="add-model">
             <input type="text" id="newModelName" placeholder="Nuevo modelo...">
-            <button id="addModelBtn">+ Agregar</button>
+            <button id="addModelBtn"><i class="fas fa-plus"></i></button>
         </div>
     </div>
     <div>
-        <h3>💬 Conversaciones</h3>
+        <h3><i class="fas fa-comments"></i> Conversaciones</h3>
         <div class="conv-actions">
-            <button id="newConvBtn">+ Nueva conversación</button>
-            <button id="saveCurrentConvBtn">💾 Guardar actual</button>
+            <button id="newConvBtn"><i class="fas fa-plus"></i> Nueva</button>
+            <button id="saveCurrentConvBtn"><i class="fas fa-save"></i> Guardar</button>
         </div>
         <ul id="convList" class="conv-list"></ul>
     </div>
 </div>
 
 <div id="big-welcome">
-    <span class="welcome-title" id="display-greet">Sincronizando...</span>
-    <span style="font-size: 20px; color: #94a3b8; letter-spacing: 0.5px; font-weight: 500; display: block; margin-top: 8px;">¿En qué puedo ayudarte hoy?</span>
+    <div class="greeting" id="display-greet">Sincronizando...</div>
+    <div class="subtitle">Asistente inteligente</div>
 </div>
 
 <div id="chat-window"></div>
 
 <div class="bottom-controls">
-    <div class="model-chips" id="modelChips"></div>
-    <div class="input-container">
-        <input type="text" id="user-input" placeholder="Escribe un mensaje..." autocomplete="off">
-        <button class="file-btn" id="fileUploadBtn" title="Subir archivo">📎</button>
-        <button class="send-btn" onclick="handleSend()">➤</button>
+    <div class="input-area">
+        <div class="model-selector" id="modelSelectorBtn">
+            <i class="fas fa-brain"></i>
+            <span id="selectedModelLabel">Nexus V5 PRO</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Escribe un mensaje..." autocomplete="off">
+            <button class="file-btn" id="fileUploadBtn" title="Subir archivo"><i class="fas fa-paperclip"></i></button>
+            <button class="send-btn" onclick="handleSend()"><i class="fas fa-arrow-up"></i></button>
+        </div>
     </div>
 </div>
 
 <div class="footer-creator">
     CREADOR: <span>SOYADRIANYT001</span>
 </div>
+
+<!-- Dropdown flotante para selección de modelos -->
+<div id="modelDropdown" class="model-dropdown"></div>
 
 <script>
 // ==================== DATABASE.JS ====================
@@ -386,91 +441,87 @@ window.NexusDatabase = {
             claves: ["hola", "buenas", "saludos", "hey", "que tal", "hello", "holi", "buen dia", "buenas tardes", "buenas noches", "como estas", "cómo estás", "que onda"],
             respuestas: {
                 manana: [
-                    "¡Buenos días! ☀️ ¿En qué puedo ayudarte?",
-                    "¡Excelente mañana! ¿Qué necesitas procesar? 🚀",
-                    "Buen día, comandante. Todo listo para trabajar",
-                    "¡Hola! ¿Cómo amaneciste? Estoy aquí para ti."
+                    "Buenos días. ¿En qué puedo ayudarte?",
+                    "Excelente mañana. ¿Qué necesitas procesar?",
+                    "Buen día. Todo listo para trabajar."
                 ],
                 tarde: [
-                    "¡Buenas tardes! 🌤️ ¿Cómo va tu día?",
-                    "Tarde productiva, ¿en qué te ayudo?",
-                    "Buenas tardes, sistema al 100%",
-                    "¡Hola! Espero que estés teniendo una gran tarde."
+                    "Buenas tardes. ¿Cómo va tu día?",
+                    "Tarde productiva. ¿En qué te ayudo?",
+                    "Sistema al 100%. ¿Qué deseas consultar?"
                 ],
                 noche: [
-                    "¡Buenas noches! 🌙 Descansa, yo trabajo por ti",
-                    "Noche activa, ¿qué deseas consultar?",
-                    "Buenas noches, listo para asistirte",
-                    "¡Hola! ¿Todo bien? Estoy aquí cuando me necesites."
+                    "Buenas noches. Descansa, yo trabajo por ti.",
+                    "Noche activa. ¿Qué deseas consultar?",
+                    "Listo para asistirte."
                 ]
             }
         },
         programacion: {
             claves: ["javascript", "python", "java", "c++", "programacion", "codigo", "funcion", "variable", "html", "css"],
             respuestas: [
-                "💻 **Programación**: JavaScript es un lenguaje versátil. ¿Quieres saber sobre variables, funciones o async?",
-                "🐍 Python es ideal para IA y ciencia de datos. ¿Necesitas ayuda con algún concepto?",
-                "🌐 HTML y CSS son la base del frontend. ¿Quieres crear una página web?",
-                "⚙️ En programación, la lógica es clave. ¿Tienes un problema específico?"
+                "Programación: JavaScript es un lenguaje versátil. ¿Quieres saber sobre variables, funciones o async?",
+                "Python es ideal para IA y ciencia de datos. ¿Necesitas ayuda con algún concepto?",
+                "HTML y CSS son la base del frontend. ¿Quieres crear una página web?",
+                "En programación, la lógica es clave. ¿Tienes un problema específico?"
             ]
         },
         matematicas: {
             claves: ["matematica", "matemáticas", "algebra", "calculo", "ecuacion", "suma", "resta", "multiplicacion", "division", "raiz"],
             respuestas: [
-                "📐 **Matemáticas**: ¿Necesitas resolver una ecuación? Dámela y te ayudo.",
-                "🧮 El álgebra lineal es fundamental para IA. ¿Quieres aprender algo en particular?",
-                "➕ Suma, resta, multiplicación, división... dime qué operación necesitas.",
-                "📊 ¿Cálculo diferencial? Te explico derivadas e integrales paso a paso."
+                "Matemáticas: ¿Necesitas resolver una ecuación? Dámela y te ayudo.",
+                "El álgebra lineal es fundamental para IA. ¿Quieres aprender algo en particular?",
+                "Suma, resta, multiplicación, división... dime qué operación necesitas.",
+                "¿Cálculo diferencial? Te explico derivadas e integrales paso a paso."
             ]
         },
         minecraft: {
             claves: ["minecraft", "diamante", "nether", "ender", "crafteo", "bloque", "pico"],
             respuestas: [
-                "🎮 En Minecraft, los diamantes se encuentran en Y=-58",
-                "⛏️ El Netherite es el material más fuerte del juego",
-                "🧱 Para craftear necesitas una mesa de trabajo",
-                "🏰 El Ender Dragon es el jefe final del juego"
+                "En Minecraft, los diamantes se encuentran en Y=-58.",
+                "El Netherite es el material más fuerte del juego.",
+                "Para craftear necesitas una mesa de trabajo.",
+                "El Ender Dragon es el jefe final del juego."
             ]
         },
         roblox: {
             claves: ["roblox", "adopt me", "brookhaven", "blox fruits"],
             respuestas: [
-                "🎮 Roblox tiene millones de juegos, ¿cuál te interesa?",
-                "🕹️ En Blox Fruits las mejores frutas son Leopardo y Dragón",
-                "🎲 Brookhaven es uno de los juegos más populares",
-                "💰 En Adopt Me las mascotas legendarias son muy valiosas"
+                "Roblox tiene millones de juegos, ¿cuál te interesa?",
+                "En Blox Fruits las mejores frutas son Leopardo y Dragón.",
+                "Brookhaven es uno de los juegos más populares.",
+                "En Adopt Me las mascotas legendarias son muy valiosas."
             ]
         },
         freefire: {
             claves: ["free fire", "ff", "diamante", "personaje", "alok"],
             respuestas: [
-                "🔫 En Free Fire, Alok es uno de los mejores personajes",
-                "💎 Los diamantes se consiguen en eventos o con recargas",
-                "🏆 La M1887 es el arma más usada en close combat"
+                "En Free Fire, Alok es uno de los mejores personajes.",
+                "Los diamantes se consiguen en eventos o con recargas.",
+                "La M1887 es el arma más usada en close combat."
             ]
         },
         creador: {
             claves: ["quien eres", "que eres", "creador", "quien te creo", "que puedes hacer"],
             respuestas: [
-                "🤖 Soy NexusCore, creado por **soyadrianyt001**. Estoy aquí para ayudarte con programación, matemáticas, juegos y más.",
-                "⚡ Mi creador es soyadrianyt001, un desarrollador experto en IA. ¿Necesitas algo específico?",
-                "💬 Puedo saludarte, responder preguntas de programación, matemáticas, juegos y cambiar mi estilo visual."
+                "Soy NexusCore, creado por soyadrianyt001. Estoy aquí para ayudarte con programación, matemáticas, juegos y más.",
+                "Mi creador es soyadrianyt001, un desarrollador experto en IA. ¿Necesitas algo específico?",
+                "Puedo saludarte, responder preguntas de programación, matemáticas, juegos y cambiar mi estilo visual."
             ]
         },
         ayuda: {
             claves: ["ayuda", "comandos", "que hacer", "como usar"],
             respuestas: [
-                "📌 **Comandos disponibles:**\n• 'hola' - Saludo personalizado\n• 'programación' - Info de programación\n• 'matemáticas' - Ayuda con cálculos\n• 'modo hacker' - Cambia el tema\n• 'modo epico' - Tema épico\n• 'normal' - Volver al tema original\n• También puedes subir archivos de texto o código para analizarlos.",
-                "🆘 Escribe 'hola', pregúntame sobre programación, matemáticas o juegos. Usa 'modo hacker' para un estilo único."
+                "Comandos disponibles: 'hola' (saludo personalizado), 'programación', 'matemáticas', 'modo hacker', 'modo epico', 'normal'. También puedes subir archivos de texto o código.",
+                "Escribe 'hola', pregúntame sobre programación, matemáticas o juegos. Usa 'modo hacker' para un estilo único."
             ]
         }
     },
     default: [
-        "Interesante... cuéntame más 🧠",
+        "Interesante... cuéntame más.",
         "No tengo información de eso aún. Pregúntame sobre programación, matemáticas o usa 'ayuda'.",
         "Procesando... ¿Puedes repetir?",
-        "Soy NexusCore, pregúntame sobre código, mates o juegos. Escribe 'ayuda' para más opciones.",
-        "No entiendo esa consulta. Escribe 'ayuda' para ver qué puedo hacer."
+        "Soy NexusCore. Pregúntame sobre código, mates o juegos. Escribe 'ayuda' para más opciones."
     ]
 };
 
@@ -485,18 +536,18 @@ const NexusBrain = {
         // 1. MODOS VISUALES
         if (msg.includes("hacker")) {
             colorModo = "hacker";
-            respuestaFinal = "🖥️ Modo Hacker activado. Interfaz reconfigurada.";
+            respuestaFinal = "Modo Hacker activado. Interfaz reconfigurada.";
         } else if (msg.includes("epico")) {
             colorModo = "epico";
-            respuestaFinal = "🔥 Modo Épico activado. Potencia al máximo.";
+            respuestaFinal = "Modo Épico activado. Potencia al máximo.";
         } else if (msg.includes("normal") || msg.includes("resetear")) {
             colorModo = "normal";
-            respuestaFinal = "🔄 Modo Normal restaurado. Estilo original.";
+            respuestaFinal = "Modo Normal restaurado. Estilo original.";
         }
 
         if (colorModo !== "none") {
             return {
-                text: "<strong style='color: var(--primary);'>[" + modelId.toUpperCase() + "]</strong><br><br>" + respuestaFinal,
+                text: `<span style="color: var(--primary); font-weight: 600;">[${modelId.toUpperCase()}]</span><br><br>${respuestaFinal}`,
                 action: colorModo
             };
         }
@@ -526,10 +577,8 @@ const NexusBrain = {
             respuestaFinal = db.default[Math.floor(Math.random() * db.default.length)];
         }
 
-        // 3. Agregar información del modelo (efecto profesional)
-        var modelHeader = "<strong style='color: var(--primary);'>[" + modelId.toUpperCase() + "]</strong><br><br>";
         return {
-            text: modelHeader + respuestaFinal,
+            text: `<span style="color: var(--primary); font-weight: 600;">[${modelId.toUpperCase()}]</span><br><br>${respuestaFinal}`,
             action: colorModo
         };
     }
@@ -577,7 +626,7 @@ function loadStorage() {
         else currentMessages = [];
     }
     renderModelsSide();
-    renderModelChips();
+    updateModelSelectorLabel();
     renderConversationsList();
     renderChatFromMessages();
 }
@@ -679,27 +728,17 @@ function renderModelsSide() {
         li.onclick = () => {
             activeModel = model;
             renderModelsSide();
-            renderModelChips();
+            updateModelSelectorLabel();
+            // Cerrar dropdown si está abierto
+            document.getElementById('modelDropdown').classList.remove('open');
         };
         container.appendChild(li);
     });
 }
 
-function renderModelChips() {
-    const container = document.getElementById('modelChips');
-    if (!container) return;
-    container.innerHTML = '';
-    modelos.forEach(model => {
-        const chip = document.createElement('div');
-        chip.className = `model-chip ${model === activeModel ? 'active' : ''}`;
-        chip.innerText = model;
-        chip.onclick = () => {
-            activeModel = model;
-            renderModelsSide();
-            renderModelChips();
-        };
-        container.appendChild(chip);
-    });
+function updateModelSelectorLabel() {
+    const label = document.getElementById('selectedModelLabel');
+    if (label) label.textContent = activeModel;
 }
 
 function addModel(name) {
@@ -708,7 +747,7 @@ function addModel(name) {
         modelos.push(name.trim());
         saveModels();
         renderModelsSide();
-        renderModelChips();
+        updateModelSelectorLabel();
     }
 }
 
@@ -752,7 +791,7 @@ function renderConversationsList() {
         span.style.cursor = 'pointer';
         span.onclick = () => loadConversation(conv.id);
         const delBtn = document.createElement('button');
-        delBtn.textContent = '🗑';
+        delBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
         delBtn.className = 'delete-conv';
         delBtn.onclick = (e) => {
             e.stopPropagation();
@@ -772,9 +811,7 @@ function setGreeting() {
     if (hora >= 6 && hora < 12) saludo = "¡Buenos días!";
     else if (hora >= 12 && hora < 19) saludo = "¡Buenas tardes!";
     const greetElement = document.getElementById('display-greet');
-    if(greetElement) {
-        greetElement.innerHTML = `${saludo}<br><span style="font-size:20px; opacity:0.8; font-weight:400;">¿Qué deseas procesar?</span>`;
-    }
+    if(greetElement) greetElement.textContent = saludo;
 }
 
 function addMessageToUI(role, content, save = true) {
@@ -872,10 +909,9 @@ function uploadFile() {
             const content = ev.target.result;
             const userMessage = `📎 Archivo subido: **${file.name}**\n\`\`\`\n${content.slice(0, 1500)}${content.length > 1500 ? '\n... (truncado)' : ''}\n\`\`\``;
             addMessageToUI('user', userMessage, true);
-            // Procesar el contenido (opcional: enviar al bot)
             const loadingId = showLoading();
             setTimeout(() => {
-                const botResponse = `✅ He recibido el archivo **${file.name}**. Contiene ${content.length} caracteres. ¿Quieres que analice algo en específico?`;
+                const botResponse = `He recibido el archivo **${file.name}**. Contiene ${content.length} caracteres. ¿Quieres que analice algo en específico?`;
                 removeLoading(loadingId);
                 addMessageToUI('bot', botResponse, true);
             }, 300);
@@ -902,11 +938,29 @@ function initParticles() {
     }
 }
 
+// Dropdown de modelos
+function buildModelDropdown() {
+    const dropdown = document.getElementById('modelDropdown');
+    dropdown.innerHTML = '';
+    modelos.forEach(model => {
+        const option = document.createElement('div');
+        option.textContent = model;
+        option.onclick = () => {
+            activeModel = model;
+            updateModelSelectorLabel();
+            renderModelsSide();
+            dropdown.classList.remove('open');
+        };
+        dropdown.appendChild(option);
+    });
+}
+
 // Inicialización
 window.onload = () => {
     initParticles();
     setGreeting();
     loadStorage();
+    buildModelDropdown();
     
     // Sidebar
     const sidebar = document.getElementById('sidebar');
@@ -924,10 +978,26 @@ window.onload = () => {
         const input = document.getElementById('newModelName');
         addModel(input.value);
         input.value = '';
+        buildModelDropdown(); // actualizar dropdown
     };
     document.getElementById('newConvBtn').onclick = () => newConversation();
     document.getElementById('saveCurrentConvBtn').onclick = () => saveCurrentConversation();
     document.getElementById('fileUploadBtn').onclick = () => uploadFile();
+    
+    // Selector de modelos: toggle dropdown
+    const selectorBtn = document.getElementById('modelSelectorBtn');
+    const dropdown = document.getElementById('modelDropdown');
+    selectorBtn.onclick = (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('open');
+        // Reconstruir dropdown por si se agregaron nuevos modelos
+        buildModelDropdown();
+    };
+    document.addEventListener('click', (e) => {
+        if (!selectorBtn.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('open');
+        }
+    });
     
     document.getElementById('user-input').addEventListener('keypress', (e) => {
         if(e.key === 'Enter') handleSend();
