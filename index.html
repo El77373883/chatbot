@@ -113,6 +113,13 @@
         .send-btn { background: var(--primary); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } }
+        
+        code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
@@ -145,71 +152,232 @@
     </div>
 </div>
 
-<script src="database.js"></script>
-<script src="brain.js"></script>
-
 <script>
-    let activeModel = "Nexus V5 PRO";
-    const modelos = [
-        { name: "Nexus V5 PRO" },
-        { name: "Nexus V4 ULTRA" },
-        { name: "Nexus V3 Lite" },
-        { name: "Core Engine X" },
-        { name: "CyberVision 2.0" }
-    ];
+// ==================== DATABASE.JS ====================
+window.NexusDatabase = {
+    categorias: {
+        saludos: {
+            claves: ["hola", "buenas", "saludos", "hey", "que tal", "hello", "holi", "buen dia", "buenas tardes", "buenas noches"],
+            respuestas: {
+                manana: [
+                    "¡Buenos días! ☀️ ¿En qué puedo ayudarte?",
+                    "¡Excelente mañana! ¿Qué necesitas procesar? 🚀",
+                    "Buen día, comandante. Todo listo para trabajar"
+                ],
+                tarde: [
+                    "¡Buenas tardes! 🌤️ ¿Cómo va tu día?",
+                    "Tarde productiva, ¿en qué te ayudo?",
+                    "Buenas tardes, sistema al 100%"
+                ],
+                noche: [
+                    "¡Buenas noches! 🌙 Descansa, yo trabajo por ti",
+                    "Noche activa, ¿qué deseas consultar?",
+                    "Buenas noches, listo para asistirte"
+                ]
+            }
+        },
+        
+        minecraft: {
+            claves: ["minecraft", "diamante", "nether", "ender", "crafteo", "bloque", "pico"],
+            respuestas: [
+                "🎮 En Minecraft, los diamantes se encuentran en Y=-58",
+                "⛏️ El Netherite es el material más fuerte del juego",
+                "🧱 Para craftear necesitas una mesa de trabajo",
+                "🏰 El Ender Dragon es el jefe final del juego"
+            ]
+        },
+        
+        roblox: {
+            claves: ["roblox", "adopt me", "brookhaven", "blox fruits"],
+            respuestas: [
+                "🎮 Roblox tiene millones de juegos, ¿cuál te interesa?",
+                "🕹️ En Blox Fruits las mejores frutas son Leopardo y Dragón",
+                "🎲 Brookhaven es uno de los juegos más populares",
+                "💰 En Adopt Me las mascotas legendarias son muy valiosas"
+            ]
+        },
+        
+        freefire: {
+            claves: ["free fire", "ff", "diamante", "personaje", "alok"],
+            respuestas: [
+                "🔫 En Free Fire, Alok es uno de los mejores personajes",
+                "💎 Los diamantes se consiguen en eventos o con recargas",
+                "🏆 La M1887 es el arma más usada en close combat"
+            ]
+        },
+        
+        creador: {
+            claves: ["quien eres", "que eres", "creador", "quien te creo", "que puedes hacer"],
+            respuestas: [
+                "🤖 Soy NexusCore, creado por **soyadrianyt001**. Estoy aquí para ayudarte",
+                "⚡ Mi creador es soyadrianyt001, un desarrollador experto en IA",
+                "💬 Puedo saludarte, responder preguntas de juegos y cambiar mi estilo visual"
+            ]
+        },
+        
+        ayuda: {
+            claves: ["ayuda", "comandos", "que hacer", "como usar"],
+            respuestas: [
+                "📌 **Comandos disponibles:**\n• 'hola' - Saludo\n• 'minecraft' - Info del juego\n• 'roblox' - Info de Roblox\n• 'modo hacker' - Cambia el tema\n• 'modo epico' - Tema épico\n• 'normal' - Volver al tema original",
+                "🆘 Escribe 'hola' para saludar, o pregúntame sobre Minecraft, Roblox o Free Fire. También puedes cambiar el tema visual con 'modo hacker' o 'modo epico'"
+            ]
+        }
+    },
+    
+    default: [
+        "Interesante... cuéntame más 🧠",
+        "No tengo información de eso aún. Pregúntame sobre juegos o usa 'ayuda'",
+        "Procesando... ¿Puedes repetir?",
+        "Soy NexusCore, pregúntame sobre juegos o usa 'hola' para saludar",
+        "No entiendo esa consulta. Escribe 'ayuda' para ver qué puedo hacer"
+    ]
+};
 
-    window.onload = () => {
-        setGreeting();
-        renderModels();
-        loadHistory();
-    };
+// ==================== BRAIN.JS ====================
+const NexusBrain = {
+    analyze: function(input, modelId) {
+        var msg = input.toLowerCase().trim();
+        var db = window.NexusDatabase;
+        var respuestaFinal = "";
+        var colorModo = "none";
 
-    function renderModels() {
-        const container = document.getElementById('model-list');
-        container.innerHTML = "";
-        modelos.forEach(m => {
-            const chip = document.createElement('div');
-            chip.className = `model-chip ${m.name === activeModel ? 'active' : ''}`;
-            chip.innerText = m.name;
-            chip.onclick = () => selectModel(chip, m.name);
-            container.appendChild(chip);
-        });
-    }
-
-    function setGreeting() {
-        const hora = new Date().getHours();
-        let saludo = "¡Buenas noches!";
-        if (hora >= 6 && hora < 12) saludo = "¡Buenos días!";
-        else if (hora >= 12 && hora < 19) saludo = "¡Buenas tardes!";
-        document.getElementById('display-greet').innerHTML = `${saludo}<br><span style="font-size:20px; opacity:0.8; font-weight:400;">¿Qué deseas procesar?</span>`;
-    }
-
-    function selectModel(el, modelName) {
-        document.querySelectorAll('.model-chip').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        activeModel = modelName;
-    }
-
-    // FUNCIÓN CORREGIDA: Sin demoras eternas y directa al cerebro local
-    function handleSend() {
-        const input = document.getElementById('user-input');
-        const text = input.value.trim();
-        if(!text) return;
-
-        const welcome = document.getElementById('big-welcome');
-        if(welcome) {
-            welcome.style.opacity = "0";
-            setTimeout(() => { if(welcome) welcome.remove(); }, 600);
+        // 1. MODOS VISUALES
+        if (msg.includes("hacker")) {
+            colorModo = "hacker";
+            respuestaFinal = "🖥️ Modo Hacker activado. Interfaz reconfigurada.";
+        } else if (msg.includes("epico")) {
+            colorModo = "epico";
+            respuestaFinal = "🔥 Modo Épico activado. Potencia al máximo.";
+        } else if (msg.includes("normal") || msg.includes("resetear")) {
+            colorModo = "normal";
+            respuestaFinal = "🔄 Modo Normal restaurado. Estilo original.";
         }
 
-        addMessage('user', text);
-        input.value = '';
-        const loadingId = showLoading();
+        // Si ya se activó un modo, retornamos inmediatamente
+        if (colorModo !== "none") {
+            return {
+                text: "<strong style='color: var(--primary);'>[" + modelId.toUpperCase() + "]</strong><br><br>" + respuestaFinal,
+                action: colorModo
+            };
+        }
 
-        // QUITAMOS EL AWAIT Y SETTIMEOUT LARGO
-        setTimeout(() => {
+        // 2. BUSCAR EN LA BASE DE DATOS
+        var encontrado = false;
+        
+        for (var cat in db.categorias) {
+            var categoria = db.categorias[cat];
+            
+            // Verificar si alguna clave coincide
+            for (var i = 0; i < categoria.claves.length; i++) {
+                if (msg.includes(categoria.claves[i])) {
+                    
+                    // Si es saludo
+                    if (cat === "saludos") {
+                        var hora = new Date().getHours();
+                        var momento;
+                        if (hora >= 6 && hora < 12) {
+                            momento = "manana";
+                        } else if (hora >= 12 && hora < 19) {
+                            momento = "tarde";
+                        } else {
+                            momento = "noche";
+                        }
+                        var respuestasMomento = categoria.respuestas[momento];
+                        var numAleatorio = Math.floor(Math.random() * respuestasMomento.length);
+                        respuestaFinal = respuestasMomento[numAleatorio];
+                    } 
+                    // Para otras categorías
+                    else {
+                        var numAleatorio = Math.floor(Math.random() * categoria.respuestas.length);
+                        respuestaFinal = categoria.respuestas[numAleatorio];
+                    }
+                    encontrado = true;
+                    break;
+                }
+            }
+            if (encontrado) break;
+        }
+
+        // 3. SI NO HAY COINCIDENCIA, USA DEFAULT
+        if (!respuestaFinal) {
+            var numAleatorio = Math.floor(Math.random() * db.default.length);
+            respuestaFinal = db.default[numAleatorio];
+        }
+
+        // 4. DEVOLVER RESULTADO
+        return {
+            text: "<strong style='color: var(--primary);'>[" + modelId.toUpperCase() + "]</strong><br><br>" + respuestaFinal,
+            action: colorModo
+        };
+    }
+};
+
+window.NexusBrain = NexusBrain;
+
+// ==================== MAIN APP ====================
+let activeModel = "Nexus V5 PRO";
+const modelos = [
+    { name: "Nexus V5 PRO" },
+    { name: "Nexus V4 ULTRA" },
+    { name: "Nexus V3 Lite" },
+    { name: "Core Engine X" },
+    { name: "CyberVision 2.0" }
+];
+
+window.onload = () => {
+    setGreeting();
+    renderModels();
+    loadHistory();
+};
+
+function renderModels() {
+    const container = document.getElementById('model-list');
+    if(!container) return;
+    container.innerHTML = "";
+    modelos.forEach(m => {
+        const chip = document.createElement('div');
+        chip.className = `model-chip ${m.name === activeModel ? 'active' : ''}`;
+        chip.innerText = m.name;
+        chip.onclick = () => selectModel(chip, m.name);
+        container.appendChild(chip);
+    });
+}
+
+function setGreeting() {
+    const hora = new Date().getHours();
+    let saludo = "¡Buenas noches!";
+    if (hora >= 6 && hora < 12) saludo = "¡Buenos días!";
+    else if (hora >= 12 && hora < 19) saludo = "¡Buenas tardes!";
+    const greetElement = document.getElementById('display-greet');
+    if(greetElement) {
+        greetElement.innerHTML = `${saludo}<br><span style="font-size:20px; opacity:0.8; font-weight:400;">¿Qué deseas procesar?</span>`;
+    }
+}
+
+function selectModel(el, modelName) {
+    document.querySelectorAll('.model-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    activeModel = modelName;
+}
+
+function handleSend() {
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
+    if(!text) return;
+
+    const welcome = document.getElementById('big-welcome');
+    if(welcome) {
+        welcome.style.opacity = "0";
+        setTimeout(() => { if(welcome && welcome.parentNode) welcome.remove(); }, 600);
+    }
+
+    addMessage('user', text);
+    input.value = '';
+    const loadingId = showLoading();
+
+    setTimeout(() => {
+        try {
             if(window.NexusBrain) {
-                // Llamada directa al cerebro local
                 const result = window.NexusBrain.analyze(text, activeModel);
                 removeLoading(loadingId);
                 
@@ -217,79 +385,97 @@
                     document.body.className = result.action;
                 }
                 addMessage('bot', result.text);
+                saveHistory();
             } else {
                 removeLoading(loadingId);
-                addMessage('bot', "ERROR: El archivo brain.js no está cargado.");
+                addMessage('bot', "Error: Sistema no disponible");
             }
-        }, 300); // Solo 0.3 segundos para que parezca que piensa
-    }
+        } catch(e) {
+            removeLoading(loadingId);
+            addMessage('bot', "Error al procesar: " + e.message);
+        }
+    }, 300);
+}
 
-    function addMessage(role, content) {
-        const win = document.getElementById('chat-window');
-        const div = document.createElement('div');
-        div.className = `bubble ${role}`;
-        win.appendChild(div);
-        
-        if (role === 'bot') {
-            let i = 0;
-            const speed = 10; 
-            div.innerHTML = "";
-            function typeWriter() {
-                if (i < content.length) {
-                    div.innerHTML = content.substring(0, i + 1).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
-                    i++;
-                    win.scrollTop = win.scrollHeight;
-                    setTimeout(typeWriter, speed);
-                } else {
-                    div.innerHTML = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
-                    saveHistory();
-                }
+function addMessage(role, content) {
+    const win = document.getElementById('chat-window');
+    if(!win) return;
+    const div = document.createElement('div');
+    div.className = `bubble ${role}`;
+    win.appendChild(div);
+    
+    if (role === 'bot') {
+        let i = 0;
+        const speed = 10;
+        div.innerHTML = "";
+        function typeWriter() {
+            if (i < content.length) {
+                let html = content.substring(0, i + 1);
+                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
+                div.innerHTML = html;
+                i++;
+                win.scrollTop = win.scrollHeight;
+                setTimeout(typeWriter, speed);
+            } else {
+                let finalHtml = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
+                div.innerHTML = finalHtml;
+                saveHistory();
             }
-            typeWriter();
-        } else {
-            div.innerHTML = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         }
-        win.scrollTop = win.scrollHeight;
+        typeWriter();
+    } else {
+        div.innerHTML = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        saveHistory();
     }
+    win.scrollTop = win.scrollHeight;
+}
 
-    function showLoading() {
-        const win = document.getElementById('chat-window');
-        const loaderDiv = document.createElement('div');
-        loaderDiv.id = 'current-loading';
-        loaderDiv.className = 'bubble bot';
-        loaderDiv.innerHTML = '<div class="premium-loader"></div>';
-        win.appendChild(loaderDiv);
-        win.scrollTop = win.scrollHeight;
-        return loaderDiv.id;
+function showLoading() {
+    const win = document.getElementById('chat-window');
+    if(!win) return null;
+    const loaderDiv = document.createElement('div');
+    loaderDiv.id = 'current-loading';
+    loaderDiv.className = 'bubble bot';
+    loaderDiv.innerHTML = '<div class="premium-loader"></div>';
+    win.appendChild(loaderDiv);
+    win.scrollTop = win.scrollHeight;
+    return loaderDiv.id;
+}
+
+function removeLoading(id) {
+    const el = document.getElementById(id);
+    if(el) el.remove();
+}
+
+function saveHistory() {
+    const chatWindow = document.getElementById('chat-window');
+    if(chatWindow) {
+        localStorage.setItem('nexus_storage_v2', chatWindow.innerHTML);
     }
+}
 
-    function removeLoading(id) {
-        const el = document.getElementById(id);
-        if(el) el.remove();
+function loadHistory() {
+    const saved = localStorage.getItem('nexus_storage_v2');
+    const chatWindow = document.getElementById('chat-window');
+    const welcome = document.getElementById('big-welcome');
+    
+    if(saved && saved.trim() !== "" && chatWindow) {
+        if(welcome) welcome.style.display = 'none';
+        chatWindow.innerHTML = saved;
+        chatWindow.scrollTop = chatWindow.scrollHeight;
     }
+}
 
-    function saveHistory() {
-        localStorage.setItem('nexus_storage_v2', document.getElementById('chat-window').innerHTML);
+function clearChat() {
+    if(confirm("¿Reiniciar sistema? Se borrará el historial.")) {
+        localStorage.removeItem('nexus_storage_v2');
+        location.reload();
     }
+}
 
-    function loadHistory() {
-        const saved = localStorage.getItem('nexus_storage_v2');
-        if(saved) {
-            const welcome = document.getElementById('big-welcome');
-            if(welcome) welcome.style.display = 'none';
-            document.getElementById('chat-window').innerHTML = saved;
-            document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight;
-        }
-    }
-
-    function clearChat() {
-        if(confirm("¿Reiniciar sistema?")) {
-            localStorage.removeItem('nexus_storage_v2');
-            location.reload();
-        }
-    }
-
-    document.getElementById('user-input').onkeypress = (e) => { if(e.key === 'Enter') handleSend() };
+document.getElementById('user-input')?.addEventListener('keypress', (e) => { 
+    if(e.key === 'Enter') handleSend(); 
+});
 </script>
 </body>
 </html>
