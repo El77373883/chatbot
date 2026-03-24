@@ -1,32 +1,34 @@
-// database.js - Diccionario de respuestas de NexusCore
+// database.js - Repositorio de Datos de NexusCore
 const NexusDatabase = {
-    "saludos": {
-        "keywords": ["hola", "buenos dias", "hey", "que tal", "saludos"],
-        "responses": [
-            "Sistema NexusCore en línea. ¿En qué puedo asistirte?",
-            "Hola. Núcleo lógico activo y esperando comandos.",
-            "Saludos. Analizando entorno de usuario... Todo estable."
-        ]
+    "categorias": {
+        "saludos": {
+            "claves": ["hola", "buenos dias", "que tal", "activar"],
+            "respuestas": [
+                "Bienvenido. Los sistemas están listos para tu entrada.",
+                "Hola. Iniciando comunicación encriptada.",
+                "Sistemas NexusCore activos. ¿Qué análisis deseas ejecutar hoy?"
+            ]
+        },
+        "infraestructura": {
+            "claves": ["servidor", "error", "codigo", "archivo", "github", "bug"],
+            "respuestas": [
+                "[ANÁLISIS] Se detectó una consulta de arquitectura. El núcleo recomienda auditar los permisos de acceso.",
+                "Iniciando escaneo de logs remotos... No se detectan anomalías críticas en el despliegue.",
+                "Entrada técnica procesada. Los parámetros de sistema se mantienen en niveles óptimos."
+            ]
+        },
+        "identidad": {
+            "claves": ["quien eres", "nombre", "creado", "nexus"],
+            "respuestas": [
+                "Soy NexusCore, un asistente de arquitectura móvil modular desarrollado para eficiencia máxima.",
+                "Mi identidad es NexusCore AI, operando desde un entorno Apple Mobile."
+            ]
+        }
     },
-    "tecnico": {
-        "keywords": ["error", "codigo", "servidor", "java", "github", "plugin", "bug"],
-        "responses": [
-            "[ANÁLISIS] Se detectó una consulta técnica. Sugiero revisar los logs de consola.",
-            "Iniciando escaneo de sintaxis... No se detectan anomalías críticas.",
-            "Entrada técnica recibida. El modelo actual recomienda optimizar el script."
-        ]
-    },
-    "quien_soy": {
-        "keywords": ["quien eres", "que eres", "tu nombre", "nexus"],
-        "responses": [
-            "Soy NexusCore AI, una interfaz de inteligencia modular ejecutada desde un iPhone.",
-            "Mi identidad es NexusCore, un asistente de arquitectura móvil avanzada."
-        ]
-    },
-    "desconocido": [
-        "Consulta analizada. No hay coincidencias exactas en la base de datos.",
-        "Comando no reconocido. ¿Deseas que intente un análisis profundo?",
-        "Entrada recibida, pero el núcleo lógico requiere más contexto."
+    "default": [
+        "Comando analizado. Sin coincidencias en la base de datos local. ¿Deseas ampliar el contexto?",
+        "Entrada recibida. Los protocolos actuales sugieren que esta consulta requiere análisis manual.",
+        "Sistemas en espera. Proporciona más parámetros para ejecutar el análisis."
     ]
 };
 
