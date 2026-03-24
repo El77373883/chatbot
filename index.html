@@ -166,6 +166,7 @@
 
     function renderModels() {
         const container = document.getElementById('model-list');
+        container.innerHTML = "";
         modelos.forEach(m => {
             const chip = document.createElement('div');
             chip.className = `model-chip ${m.name === activeModel ? 'active' : ''}`;
@@ -189,7 +190,8 @@
         activeModel = modelName;
     }
 
-    async function handleSend() {
+    // FUNCIÓN CORREGIDA: Sin demoras eternas y directa al cerebro local
+    function handleSend() {
         const input = document.getElementById('user-input');
         const text = input.value.trim();
         if(!text) return;
@@ -204,16 +206,22 @@
         input.value = '';
         const loadingId = showLoading();
 
-        // AQUÍ CONECTAMOS CON BRAIN.JS PARA QUITAR EL "TERMINAL" VIEJO
-        if(window.NexusBrain) {
-            const result = await window.NexusBrain.analyze(text, activeModel);
-            
-            setTimeout(() => {
+        // QUITAMOS EL AWAIT Y SETTIMEOUT LARGO
+        setTimeout(() => {
+            if(window.NexusBrain) {
+                // Llamada directa al cerebro local
+                const result = window.NexusBrain.analyze(text, activeModel);
                 removeLoading(loadingId);
-                if(result.action !== "none") document.body.className = result.action;
+                
+                if(result.action && result.action !== "none") {
+                    document.body.className = result.action;
+                }
                 addMessage('bot', result.text);
-            }, 1200);
-        }
+            } else {
+                removeLoading(loadingId);
+                addMessage('bot', "ERROR: El archivo brain.js no está cargado.");
+            }
+        }, 300); // Solo 0.3 segundos para que parezca que piensa
     }
 
     function addMessage(role, content) {
@@ -224,7 +232,8 @@
         
         if (role === 'bot') {
             let i = 0;
-            const speed = 15; 
+            const speed = 10; 
+            div.innerHTML = "";
             function typeWriter() {
                 if (i < content.length) {
                     div.innerHTML = content.substring(0, i + 1).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
