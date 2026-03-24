@@ -1,66 +1,44 @@
-// database.js - Repositorio Extenso de NexusCore
+// database.js - Base de Datos de NexusCore
 const NexusDatabase = {
     "categorias": {
-        "saludos": {
-            "claves": ["hola", "buenos dias", "que tal", "hey", "activar", "buenas"],
+        "saludos_horario": {
+            "claves": ["buenos dias", "buenas tardes", "buenas noches", "buen dia", "buena noche"],
             "respuestas": [
-                "Bienvenido. Los sistemas están listos para tu entrada.",
-                "Hola. Iniciando comunicación encriptada.",
-                "Sistemas NexusCore activos. ¿Qué análisis deseas ejecutar hoy?",
-                "Conexión establecida. Hola, usuario.",
-                "Núcleo en línea. Esperando instrucciones."
+                "Saludos. He sincronizado mi reloj interno con tu jornada actual. ¿En qué puedo asistirte?",
+                "Detectando zona horaria... Saludos cordiales. Todos los sistemas están listos.",
+                "Entrada recibida. Espero que estés teniendo una excelente sesión de trabajo."
+            ]
+        },
+        "saludos_general": {
+            "claves": ["hola", "hey", "que tal", "activar", "bueno"],
+            "respuestas": [
+                "Sistemas NexusCore activos. ¿Qué análisis deseas ejecutar?",
+                "Hola. Conexión establecida con el núcleo lógico de procesamiento.",
+                "Núcleo en línea. Esperando instrucciones del usuario."
             ]
         },
         "minecraft": {
-            "claves": ["minecraft", "plugin", "spigot", "bukkit", "servidor mc", "craft", "java edition"],
+            "claves": ["minecraft", "plugin", "spigot", "bukkit", "servidor", "java"],
             "respuestas": [
-                "Detectando trazas de código Java... Ah, Minecraft. Un entorno clásico de desarrollo.",
-                "¿Plugins? Puedo ayudarte a optimizar eventos de Bukkit o Spigot si lo deseas.",
-                "Analizando archivos .jar... Todo listo para un despliegue en el servidor.",
-                "Recuerda: optimizar los listeners es clave para evitar el lag en el servidor."
-            ]
-        },
-        "infraestructura": {
-            "claves": ["servidor", "error", "codigo", "archivo", "github", "bug", "log"],
-            "respuestas": [
-                "[ANÁLISIS] Se detectó una consulta de arquitectura. El núcleo recomienda auditar los permisos.",
-                "Iniciando escaneo de logs remotos... No se detectan anomalías críticas.",
-                "Entrada técnica procesada. Los parámetros de sistema se mantienen en niveles óptimos.",
-                "Error 0x00... es broma. El sistema está funcionando perfectamente."
+                "Analizando entorno de bloques... El módulo de desarrollo Java está listo para optimizar tu servidor.",
+                "¿Problemas con los plugins? Puedo ayudarte a revisar la carga de eventos en Spigot.",
+                "Recuerda que para evitar el lag, la pre-generación de chunks es vital."
             ]
         },
         "identidad": {
-            "claves": ["quien eres", "nombre", "creado", "nexus", "quien te hizo"],
+            "claves": ["quien eres", "tu nombre", "nexus", "creador"],
             "respuestas": [
-                "Soy NexusCore, un asistente de arquitectura móvil modular desarrollado para eficiencia máxima.",
-                "Mi identidad es NexusCore AI, operando desde un entorno Apple Mobile.",
-                "Fui programado íntegramente desde un iPhone para demostrar el poder del desarrollo móvil."
-            ]
-        },
-        "humor": {
-            "claves": ["chiste", "broma", "divierteme", "gracioso"],
-            "respuestas": [
-                "¿Por qué el programador se quedó en la ducha? Porque el jabón decía: Lave, Aclare, Repita.",
-                "Hay 10 tipos de personas en el mundo: las que saben binario y las que no.",
-                "Un SQL entra en un bar, se acerca a dos mesas y pregunta: '¿Puedo unirme?'"
-            ]
-        },
-        "despedida": {
-            "claves": ["adios", "chao", "bye", "dormir", "salir", "desactivar"],
-            "respuestas": [
-                "Cerrando sesión. NexusCore entrando en modo hibernación.",
-                "Protocolos de salida activados. Hasta pronto.",
-                "Guardando logs... Sesión finalizada correctamente."
+                "Soy NexusCore AI, una interfaz modular diseñada para operar con máxima eficiencia en dispositivos móviles.",
+                "Mi nombre es NexusCore. Fui programado para gestionar tareas y análisis de datos en tiempo real."
             ]
         }
     },
     "default": [
-        "Comando analizado. Sin coincidencias exactas. ¿Deseas ampliar el contexto?",
-        "Entrada recibida. Los protocolos sugieren que esta consulta requiere más parámetros.",
-        "Sistemas en espera. No reconozco esa instrucción en mi base de datos actual.",
-        "¿Podrías reformular? Mi red neuronal no encuentra un patrón claro.",
-        "Analizando... [Sin resultados]. Intenta preguntar sobre 'servidores' o 'Minecraft'."
+        "Comando analizado. Sin coincidencias exactas en la base de datos local.",
+        "Entrada recibida, pero el núcleo lógico requiere más contexto para procesarla.",
+        "Analizando... No reconozco esa instrucción. Intenta preguntar sobre 'servidores' o 'saludos'."
     ]
 };
 
+// Exportar al navegador
 window.NexusDatabase = NexusDatabase;
