@@ -1,49 +1,44 @@
 const NexusBrain = {
-    async analyze(input, modelId) {
-        // 1. Limpiar el texto que escribe el usuario
-        const msg = input.toLowerCase().trim();
-        const db = window.NexusDatabase;
-        let response = "";
-        let action = "none";
+    // Función de análisis ultra-directa
+    analyze: function(input, modelId) {
+        var msg = input.toLowerCase().trim();
+        var db = window.NexusDatabase;
+        var respuestaFinal = "";
+        var colorModo = "none";
 
-        // 2. Cambiar colores (Modos visuales)
-        if (msg.includes("hacker") || msg.includes("matrix")) action = "hacker";
-        else if (msg.includes("epico") || msg.includes("fuego")) action = "epico";
-        else if (msg.includes("normal") || msg.includes("original") || msg.includes("resetear")) action = "normal";
+        // 1. MODOS VISUALES (Al instante)
+        if (msg.includes("hacker")) colorModo = "hacker";
+        else if (msg.includes("epico")) colorModo = "epico";
+        else if (msg.includes("normal") || msg.includes("resetear")) colorModo = "normal";
 
-        // 3. Buscar en la base de datos (Saludos y categorías)
-        const hora = new Date().getHours();
-        let momento = (hora >= 6 && hora < 12) ? "manana" : (hora >= 12 && hora < 19) ? "tarde" : "noche";
-
-        // Revisar si es un saludo
-        const esSaludo = db.categorias.saludos.claves.some(clave => msg.includes(clave));
-        
-        if (esSaludo) {
-            const lista = db.categorias.saludos.respuestas[momento];
-            response = lista[Math.floor(Math.random() * lista.length)];
-        } else {
-            // Revisar si coincide con otra cosa que tengas en database.js
-            for (let cat in db.categorias) {
-                if (db.categorias[cat].claves.some(clave => msg.includes(clave))) {
-                    const rList = db.categorias[cat].respuestas;
-                    response = rList[Math.floor(Math.random() * rList.length)];
-                    break;
+        // 2. BUSCAR EN LA BASE DE DATOS (database.js)
+        // Buscamos si el mensaje coincide con alguna clave
+        for (var cat in db.categorias) {
+            var categoria = db.categorias[cat];
+            if (categoria.claves.some(function(clave) { return msg.includes(clave); })) {
+                
+                // Si es un saludo (tiene mañana, tarde, noche)
+                if (cat === "saludos") {
+                    var hora = new Date().getHours();
+                    var momento = (hora >= 6 && hora < 12) ? "manana" : (hora >= 12 && hora < 19) ? "tarde" : "noche";
+                    respuestaFinal = categoria.respuestas[momento][0];
+                } else {
+                    // Si es otra categoría (Minecraft, etc)
+                    respuestaFinal = categoria.respuestas[0];
                 }
+                break;
             }
         }
 
-        // 4. Si el bot no encuentra la palabra, usa la respuesta por defecto
-        if (!response) {
-            response = db.default[Math.floor(Math.random() * db.default.length)];
+        // 3. SI NO HAY COINCIDENCIA, USA EL DEFAULT
+        if (!respuestaFinal) {
+            respuestaFinal = db.default[0];
         }
 
-        // 5. El diseño que se ve en pantalla
-        const tagHeader = `<strong>[${modelId.toUpperCase()}]</strong><br>`;
-        const statusLine = `<small style="opacity: 0.6;">ESTADO: CONECTADO</small><br><br>`;
-
+        // 4. DEVOLVER EL RESULTADO (Sin promesas, sin esperas)
         return {
-            text: tagHeader + statusLine + response, 
-            action: action
+            text: "<strong>[" + modelId.toUpperCase() + "]</strong><br><br>" + respuestaFinal,
+            action: colorModo
         };
     }
 };
