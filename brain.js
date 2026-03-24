@@ -1,21 +1,20 @@
 const NexusBrain = {
-    // API KEY GRATUITA DE CORTESÍA (Modelo: Qwen 2.5 Coder - Especialista en Programación)
-    // Nota: Esta es una clave de acceso público para pruebas.
+    // API de Programación (Hugging Face)
     API_URL: "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-Coder-32B-Instruct",
-    API_TOKEN: "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", // Token de ejemplo
+    API_TOKEN: "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",
 
     async analyze(input, modelId) {
-        const msg = input.toLowerCase();
+        const msg = input.toLowerCase().trim();
         const db = window.NexusDatabase;
         let response = "";
         let action = "none";
 
-        // 1. Lógica de Modos Visuales (Se mantiene intacta)
+        // 1. MODOS VISUALES (Respuesta instantánea)
         if (msg.includes("hacker") || msg.includes("matrix")) action = "hacker";
         else if (msg.includes("epico") || msg.includes("fuego")) action = "epico";
         else if (msg.includes("normal") || msg.includes("original") || msg.includes("resetear")) action = "normal";
 
-        // 2. Buscar primero en tu Base de Datos Local (Saludos y Comandos rápidos)
+        // 2. BUSCAR EN DATABASE LOCAL (Prioridad 1: Siempre funciona)
         const hora = new Date().getHours();
         let momento = (hora >= 6 && hora < 12) ? "manana" : (hora >= 12 && hora < 19) ? "tarde" : "noche";
         
@@ -25,18 +24,22 @@ const NexusBrain = {
             const lista = db.categorias.saludos.respuestas[momento];
             response = lista[Math.floor(Math.random() * lista.length)];
         } else {
-            // Buscar en otras categorías locales (Minecraft, etc.)
             for (let cat in db.categorias) {
                 if (db.categorias[cat].claves.some(clave => msg.includes(clave))) {
-                    response = db.categorias[cat].respuestas[Math.floor(Math.random() * db.categorias[cat].respuestas.length)];
+                    const rList = db.categorias[cat].respuestas;
+                    response = rList[Math.floor(Math.random() * rList.length)];
                     break;
                 }
             }
         }
 
-        // 3. SI NO ESTÁ EN LA DB, LLAMAR A LA API DE PROGRAMACIÓN
+        // 3. SI NO HAY RESPUESTA LOCAL, INTENTAR API CON TIEMPO LÍMITE (TIMEOUT)
         if (!response) {
             try {
+                // Si la API no responde en 2.5 segundos, pasamos al plan B
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 2500);
+
                 const apiRes = await fetch(this.API_URL, {
                     method: "POST",
                     headers: {
@@ -44,23 +47,33 @@ const NexusBrain = {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        inputs: `Responde como un asistente de programación experto llamado Nexus. Usuario pregunta: ${input}`,
-                        parameters: { max_new_tokens: 500, temperature: 0.7 }
-                    })
+                        inputs: `Responde breve en español: ${input}`,
+                    }),
+                    signal: controller.signal
                 });
+
                 const data = await apiRes.json();
-                response = data[0].generated_text.split("Usuario pregunta:")[1] || data[0].generated_text;
+                clearTimeout(timeoutId);
+
+                if (data && data[0] && data[0].generated_text) {
+                    response = data[0].generated_text.replace(/<[^>]*>?/gm, ''); // Limpiar HTML
+                }
             } catch (error) {
-                response = "Error de conexión con el núcleo de IA. Revisa tu internet.";
+                console.warn("API lenta o bloqueada. Usando respuesta por defecto.");
             }
         }
 
+        // 4. FALLBACK DE SEGURIDAD (Si todo lo anterior falla)
+        if (!response) {
+            response = db.default[Math.floor(Math.random() * db.default.length)];
+        }
+
         // --- DISEÑO PREMIUM FINAL ---
-        const tagHeader = `<strong style="color: var(--primary); letter-spacing: 1px;">[${modelId.toUpperCase()}]</strong><br>`;
-        const statusLine = `<span style="font-size: 10px; opacity: 0.6; text-transform: uppercase;">PROCESAMIENTO POR IA • ESTADO: ONLINE</span><br><br>`;
+        const tag = `**[${modelId.toUpperCase()}]** <br>`;
+        const status = `<small style="color:var(--primary); font-weight:bold; opacity:0.8;">> STATUS: ONLINE | RED NEXUS</small><br><br>`;
 
         return {
-            text: tagHeader + statusLine + response.trim(),
+            text: tag + status + response,
             action: action
         };
     }
