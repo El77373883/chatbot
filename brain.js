@@ -3,22 +3,26 @@ const NexusBrain = {
         const msg = input.toLowerCase();
         const db = window.NexusDatabase;
         let response = "";
+        let action = "none";
 
-        // 1. Detectar el momento del día
+        // 1. Detectar Cambios de Interfaz
+        if (msg.includes("hacker") || msg.includes("matrix")) action = "hacker";
+        else if (msg.includes("epico") || msg.includes("fuego")) action = "epico";
+        else if (msg.includes("normal") || msg.includes("original") || msg.includes("resetear")) action = "normal";
+
+        // 2. Determinar momento del día
         const hora = new Date().getHours();
         let momento = (hora >= 6 && hora < 12) ? "manana" : (hora >= 12 && hora < 19) ? "tarde" : "noche";
 
-        // 2. BUSCAR EN CATEGORÍAS
-        // Primero revisamos saludos para manejar el tiempo del día
+        // 3. Buscar respuesta en la DB
         const esSaludo = db.categorias.saludos.claves.some(clave => msg.includes(clave));
         
         if (esSaludo) {
-            const listaSaludos = db.categorias.saludos.respuestas[momento];
-            response = listaSaludos[Math.floor(Math.random() * listaSaludos.length)];
+            const lista = db.categorias.saludos.respuestas[momento];
+            response = lista[Math.floor(Math.random() * lista.length)];
         } else {
-            // Buscar en otras categorías (Minecraft, estado_animo, agradecimiento, etc.)
             for (let cat in db.categorias) {
-                if (cat !== "saludos" && db.categorias[cat].claves.some(clave => msg.includes(clave))) {
+                if (db.categorias[cat].claves.some(clave => msg.includes(clave))) {
                     const rList = db.categorias[cat].respuestas || db.categorias[cat].responses;
                     response = rList[Math.floor(Math.random() * rList.length)];
                     break;
@@ -26,16 +30,17 @@ const NexusBrain = {
             }
         }
 
-        // 3. Respuesta por defecto si no encontró nada
+        // 4. Fallback si no hay respuesta
         if (!response) {
             response = db.default[Math.floor(Math.random() * db.default.length)];
         }
 
-        // 4. Aplicar el prefijo del Motor elegido
         const motorPrefix = db.motores[modelId] || `<b>[${modelId}]</b>`;
         
-        // Simular un pequeño retraso de "pensamiento" más humano
-        return `${motorPrefix}<br>${response}`;
+        return {
+            text: `${motorPrefix}<br>${response}`,
+            action: action
+        };
     }
 };
 window.NexusBrain = NexusBrain;
