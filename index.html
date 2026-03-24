@@ -34,7 +34,6 @@
             transition: all 0.5s ease;
         }
 
-        /* MODOS VISUALES */
         body.hacker { --primary: #00ff41; background: #000; }
         body.epico { --primary: #ff4500; }
 
@@ -45,10 +44,117 @@
             backdrop-filter: blur(20px); z-index: 100;
         }
 
-        .brand { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; }
+        .brand { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; cursor: pointer; }
         .brand span { color: var(--primary); }
         .creator-tag { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700; }
         .creator-tag span { color: var(--primary); }
+
+        /* Menú hamburguesa */
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0 10px;
+            transition: 0.3s;
+        }
+        .menu-btn:hover { color: var(--primary); }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100%;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            z-index: 200;
+            transition: left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        .sidebar.open { left: 0; }
+        .sidebar h3 { margin: 0 0 10px 0; font-size: 16px; border-left: 3px solid var(--primary); padding-left: 10px; }
+        .sidebar .close-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .model-list-side, .conv-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .model-list-side li, .conv-list li {
+            padding: 10px;
+            margin-bottom: 5px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .model-list-side li.active, .conv-list li.active {
+            background: var(--primary);
+            color: white;
+        }
+        .add-model {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .add-model input {
+            flex: 1;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 8px 12px;
+            color: white;
+            outline: none;
+        }
+        .add-model button {
+            background: var(--primary);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: white;
+        }
+        .conv-actions {
+            display: flex;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .conv-actions button {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .delete-conv {
+            background: rgba(239,68,68,0.3);
+            border: none;
+            color: #ef4444;
+            border-radius: 20px;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 10px;
+        }
 
         #chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; z-index: 10; scroll-behavior: smooth; }
 
@@ -93,17 +199,6 @@
             backdrop-filter: blur(20px); z-index: 100;
         }
 
-        .model-container { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding: 0 10px; }
-        .model-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; flex: 1; scrollbar-width: none; }
-        .model-bar::-webkit-scrollbar { display: none; }
-
-        .model-chip {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-            color: #94a3b8; padding: 8px 16px; border-radius: 20px; font-size: 10px;
-            font-weight: 700; cursor: pointer; transition: 0.3s; white-space: nowrap; text-transform: uppercase;
-        }
-        .model-chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
-
         .input-container { 
             background: rgba(0, 0, 0, 0.4); border-radius: 28px; display: flex; 
             padding: 6px 6px 6px 20px; align-items: center; border: 1px solid var(--border);
@@ -125,25 +220,47 @@
 <body>
 
 <header>
-    <div class="brand-container">
-        <div class="brand">NEXUS<span>CORE</span></div>
-        <span class="creator-tag">CREADOR: <span>SOYADRIANYT001</span></span>
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="menu-btn" id="menuBtn">☰</button>
+        <div class="brand-container">
+            <div class="brand">NEXUS<span>CORE</span></div>
+            <span class="creator-tag">CREADOR: <span>SOYADRIANYT001</span></span>
+        </div>
     </div>
+    <div></div>
 </header>
+
+<!-- Sidebar -->
+<div id="sidebar" class="sidebar">
+    <button class="close-btn" id="closeSidebar">✖ Cerrar</button>
+    
+    <div>
+        <h3>📌 Modelos</h3>
+        <ul id="modelListSide" class="model-list-side"></ul>
+        <div class="add-model">
+            <input type="text" id="newModelName" placeholder="Nuevo modelo...">
+            <button id="addModelBtn">+ Agregar</button>
+        </div>
+    </div>
+
+    <div>
+        <h3>💬 Conversaciones</h3>
+        <div class="conv-actions">
+            <button id="newConvBtn">+ Nueva conversación</button>
+            <button id="saveCurrentConvBtn">💾 Guardar actual</button>
+        </div>
+        <ul id="convList" class="conv-list"></ul>
+    </div>
+</div>
 
 <div id="big-welcome">
     <span class="welcome-title" id="display-greet">Sincronizando...</span>
-    <span style="font-size: 13px; color: #94a3b8; letter-spacing: 1px; font-weight: 500;">¿En qué puedo ayudarte hoy?</span>
+    <span style="font-size: 20px; color: #94a3b8; letter-spacing: 0.5px; font-weight: 500; display: block; margin-top: 8px;">¿En qué puedo ayudarte hoy?</span>
 </div>
 
 <div id="chat-window"></div>
 
 <div class="bottom-controls">
-    <div class="model-container">
-        <div class="model-bar" id="model-list"></div>
-        <button onclick="clearChat()" style="background:rgba(239, 68, 68, 0.1); border:1px solid rgba(239, 68, 68, 0.2); color:#ef4444; padding: 8px 12px; border-radius: 12px; font-size:9px; font-weight:700; cursor:pointer;">RESETEAR</button>
-    </div>
-
     <div class="input-container">
         <input type="text" id="user-input" placeholder="Escribe un mensaje..." autocomplete="off">
         <button class="send-btn" onclick="handleSend()">
@@ -176,7 +293,6 @@ window.NexusDatabase = {
                 ]
             }
         },
-        
         minecraft: {
             claves: ["minecraft", "diamante", "nether", "ender", "crafteo", "bloque", "pico"],
             respuestas: [
@@ -186,7 +302,6 @@ window.NexusDatabase = {
                 "🏰 El Ender Dragon es el jefe final del juego"
             ]
         },
-        
         roblox: {
             claves: ["roblox", "adopt me", "brookhaven", "blox fruits"],
             respuestas: [
@@ -196,7 +311,6 @@ window.NexusDatabase = {
                 "💰 En Adopt Me las mascotas legendarias son muy valiosas"
             ]
         },
-        
         freefire: {
             claves: ["free fire", "ff", "diamante", "personaje", "alok"],
             respuestas: [
@@ -205,7 +319,6 @@ window.NexusDatabase = {
                 "🏆 La M1887 es el arma más usada en close combat"
             ]
         },
-        
         creador: {
             claves: ["quien eres", "que eres", "creador", "quien te creo", "que puedes hacer"],
             respuestas: [
@@ -214,7 +327,6 @@ window.NexusDatabase = {
                 "💬 Puedo saludarte, responder preguntas de juegos y cambiar mi estilo visual"
             ]
         },
-        
         ayuda: {
             claves: ["ayuda", "comandos", "que hacer", "como usar"],
             respuestas: [
@@ -223,7 +335,6 @@ window.NexusDatabase = {
             ]
         }
     },
-    
     default: [
         "Interesante... cuéntame más 🧠",
         "No tengo información de eso aún. Pregúntame sobre juegos o usa 'ayuda'",
@@ -253,7 +364,6 @@ const NexusBrain = {
             respuestaFinal = "🔄 Modo Normal restaurado. Estilo original.";
         }
 
-        // Si ya se activó un modo, retornamos inmediatamente
         if (colorModo !== "none") {
             return {
                 text: "<strong style='color: var(--primary);'>[" + modelId.toUpperCase() + "]</strong><br><br>" + respuestaFinal,
@@ -261,35 +371,19 @@ const NexusBrain = {
             };
         }
 
-        // 2. BUSCAR EN LA BASE DE DATOS
+        // 2. BUSCAR EN DB
         var encontrado = false;
-        
         for (var cat in db.categorias) {
             var categoria = db.categorias[cat];
-            
-            // Verificar si alguna clave coincide
             for (var i = 0; i < categoria.claves.length; i++) {
                 if (msg.includes(categoria.claves[i])) {
-                    
-                    // Si es saludo
                     if (cat === "saludos") {
                         var hora = new Date().getHours();
-                        var momento;
-                        if (hora >= 6 && hora < 12) {
-                            momento = "manana";
-                        } else if (hora >= 12 && hora < 19) {
-                            momento = "tarde";
-                        } else {
-                            momento = "noche";
-                        }
+                        var momento = (hora >= 6 && hora < 12) ? "manana" : (hora >= 12 && hora < 19) ? "tarde" : "noche";
                         var respuestasMomento = categoria.respuestas[momento];
-                        var numAleatorio = Math.floor(Math.random() * respuestasMomento.length);
-                        respuestaFinal = respuestasMomento[numAleatorio];
-                    } 
-                    // Para otras categorías
-                    else {
-                        var numAleatorio = Math.floor(Math.random() * categoria.respuestas.length);
-                        respuestaFinal = categoria.respuestas[numAleatorio];
+                        respuestaFinal = respuestasMomento[Math.floor(Math.random() * respuestasMomento.length)];
+                    } else {
+                        respuestaFinal = categoria.respuestas[Math.floor(Math.random() * categoria.respuestas.length)];
                     }
                     encontrado = true;
                     break;
@@ -298,13 +392,10 @@ const NexusBrain = {
             if (encontrado) break;
         }
 
-        // 3. SI NO HAY COINCIDENCIA, USA DEFAULT
         if (!respuestaFinal) {
-            var numAleatorio = Math.floor(Math.random() * db.default.length);
-            respuestaFinal = db.default[numAleatorio];
+            respuestaFinal = db.default[Math.floor(Math.random() * db.default.length)];
         }
 
-        // 4. DEVOLVER RESULTADO
         return {
             text: "<strong style='color: var(--primary);'>[" + modelId.toUpperCase() + "]</strong><br><br>" + respuestaFinal,
             action: colorModo
@@ -314,35 +405,223 @@ const NexusBrain = {
 
 window.NexusBrain = NexusBrain;
 
-// ==================== MAIN APP ====================
+// ==================== GESTIÓN DE MODELOS Y CONVERSACIONES ====================
 let activeModel = "Nexus V5 PRO";
-const modelos = [
-    { name: "Nexus V5 PRO" },
-    { name: "Nexus V4 ULTRA" },
-    { name: "Nexus V3 Lite" },
-    { name: "Core Engine X" },
-    { name: "CyberVision 2.0" }
+let modelos = [
+    "Nexus V5 PRO",
+    "Nexus V4 ULTRA",
+    "Nexus V3 Lite",
+    "Core Engine X",
+    "CyberVision 2.0"
 ];
 
-window.onload = () => {
-    setGreeting();
-    renderModels();
-    loadHistory();
-};
+// Conversaciones: { id, title, messages: [{role, content, html?}] }
+let conversations = [];
+let currentConvId = null;
+let currentMessages = []; // array de {role, content}
 
-function renderModels() {
-    const container = document.getElementById('model-list');
-    if(!container) return;
-    container.innerHTML = "";
-    modelos.forEach(m => {
-        const chip = document.createElement('div');
-        chip.className = `model-chip ${m.name === activeModel ? 'active' : ''}`;
-        chip.innerText = m.name;
-        chip.onclick = () => selectModel(chip, m.name);
-        container.appendChild(chip);
+// Cargar datos guardados
+function loadStorage() {
+    const savedModels = localStorage.getItem('nexus_models');
+    if (savedModels) modelos = JSON.parse(savedModels);
+    
+    const savedConvs = localStorage.getItem('nexus_conversations');
+    if (savedConvs) {
+        conversations = JSON.parse(savedConvs);
+        // Restaurar última conversación activa
+        const lastId = localStorage.getItem('nexus_current_conv');
+        if (lastId && conversations.find(c => c.id === lastId)) {
+            currentConvId = lastId;
+        } else if (conversations.length > 0) {
+            currentConvId = conversations[0].id;
+        } else {
+            newConversation();
+        }
+    } else {
+        newConversation();
+    }
+    
+    if (currentConvId) {
+        const conv = conversations.find(c => c.id === currentConvId);
+        if (conv) currentMessages = conv.messages;
+        else currentMessages = [];
+    }
+    renderModelsSide();
+    renderConversationsList();
+    renderChatFromMessages();
+}
+
+function saveModels() {
+    localStorage.setItem('nexus_models', JSON.stringify(modelos));
+}
+
+function saveConversations() {
+    localStorage.setItem('nexus_conversations', JSON.stringify(conversations));
+    localStorage.setItem('nexus_current_conv', currentConvId);
+}
+
+function newConversation(title = null) {
+    const id = Date.now().toString();
+    const convTitle = title || `Chat ${new Date().toLocaleString()}`;
+    conversations.unshift({
+        id: id,
+        title: convTitle,
+        messages: []
+    });
+    currentConvId = id;
+    currentMessages = [];
+    renderChatFromMessages();
+    renderConversationsList();
+    saveConversations();
+    // Ocultar bienvenida si hay mensajes? pero está vacío, mostramos bienvenida
+    const welcome = document.getElementById('big-welcome');
+    if (welcome) welcome.style.display = 'flex';
+}
+
+function saveCurrentConversation() {
+    if (!currentConvId) return;
+    const index = conversations.findIndex(c => c.id === currentConvId);
+    if (index !== -1) {
+        conversations[index].messages = [...currentMessages];
+        // Actualizar título si es el primero y no tiene título personalizado
+        if (conversations[index].title === `Chat ${new Date(parseInt(currentConvId)).toLocaleString()}` && currentMessages.length > 0) {
+            // Tomar primer mensaje como título
+            const firstUserMsg = currentMessages.find(m => m.role === 'user');
+            if (firstUserMsg) {
+                let newTitle = firstUserMsg.content.slice(0, 30);
+                conversations[index].title = newTitle + (firstUserMsg.content.length > 30 ? '...' : '');
+            }
+        }
+        saveConversations();
+        renderConversationsList();
+    }
+}
+
+function loadConversation(id) {
+    const conv = conversations.find(c => c.id === id);
+    if (conv) {
+        currentConvId = id;
+        currentMessages = [...conv.messages];
+        renderChatFromMessages();
+        renderConversationsList();
+        saveConversations();
+        const welcome = document.getElementById('big-welcome');
+        if (welcome && currentMessages.length > 0) welcome.style.display = 'none';
+        else if (welcome && currentMessages.length === 0) welcome.style.display = 'flex';
+    }
+}
+
+function deleteConversation(id) {
+    conversations = conversations.filter(c => c.id !== id);
+    if (currentConvId === id) {
+        if (conversations.length > 0) {
+            currentConvId = conversations[0].id;
+            currentMessages = conversations[0].messages;
+        } else {
+            newConversation();
+        }
+    }
+    saveConversations();
+    renderConversationsList();
+    renderChatFromMessages();
+    const welcome = document.getElementById('big-welcome');
+    if (welcome && currentMessages.length === 0) welcome.style.display = 'flex';
+}
+
+function addMessageToCurrent(role, content) {
+    currentMessages.push({ role, content });
+    saveCurrentConversation();
+    // Si es el primer mensaje y la conversación no tiene título personalizado, actualizar título
+    const conv = conversations.find(c => c.id === currentConvId);
+    if (conv && conv.title.startsWith('Chat ') && currentMessages.length === 1 && role === 'user') {
+        let newTitle = content.slice(0, 30);
+        conv.title = newTitle + (content.length > 30 ? '...' : '');
+        saveConversations();
+        renderConversationsList();
+    }
+}
+
+function renderModelsSide() {
+    const container = document.getElementById('modelListSide');
+    if (!container) return;
+    container.innerHTML = '';
+    modelos.forEach(model => {
+        const li = document.createElement('li');
+        li.textContent = model;
+        if (model === activeModel) li.classList.add('active');
+        li.onclick = () => {
+            activeModel = model;
+            renderModelsSide();
+            // Opcional: mostrar notificación
+        };
+        container.appendChild(li);
     });
 }
 
+function addModel(name) {
+    if (!name.trim()) return;
+    if (!modelos.includes(name.trim())) {
+        modelos.push(name.trim());
+        saveModels();
+        renderModelsSide();
+    }
+}
+
+// Renderizar chat desde currentMessages
+function renderChatFromMessages() {
+    const chatWindow = document.getElementById('chat-window');
+    if (!chatWindow) return;
+    chatWindow.innerHTML = '';
+    if (currentMessages.length === 0) {
+        const welcome = document.getElementById('big-welcome');
+        if (welcome) welcome.style.display = 'flex';
+        return;
+    }
+    const welcome = document.getElementById('big-welcome');
+    if (welcome) welcome.style.display = 'none';
+    
+    currentMessages.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = `bubble ${msg.role}`;
+        if (msg.role === 'bot') {
+            div.innerHTML = msg.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
+        } else {
+            div.innerHTML = msg.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        }
+        chatWindow.appendChild(div);
+    });
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+function renderConversationsList() {
+    const container = document.getElementById('convList');
+    if (!container) return;
+    container.innerHTML = '';
+    conversations.forEach(conv => {
+        const li = document.createElement('li');
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
+        const span = document.createElement('span');
+        span.textContent = conv.title;
+        span.style.flex = '1';
+        span.style.cursor = 'pointer';
+        span.onclick = () => loadConversation(conv.id);
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '🗑';
+        delBtn.className = 'delete-conv';
+        delBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteConversation(conv.id);
+        };
+        li.appendChild(span);
+        li.appendChild(delBtn);
+        if (conv.id === currentConvId) li.classList.add('active');
+        container.appendChild(li);
+    });
+}
+
+// Funciones de UI y mensajes
 function setGreeting() {
     const hora = new Date().getHours();
     let saludo = "¡Buenas noches!";
@@ -354,60 +633,16 @@ function setGreeting() {
     }
 }
 
-function selectModel(el, modelName) {
-    document.querySelectorAll('.model-chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    activeModel = modelName;
-}
-
-function handleSend() {
-    const input = document.getElementById('user-input');
-    const text = input.value.trim();
-    if(!text) return;
-
-    const welcome = document.getElementById('big-welcome');
-    if(welcome) {
-        welcome.style.opacity = "0";
-        setTimeout(() => { if(welcome && welcome.parentNode) welcome.remove(); }, 600);
-    }
-
-    addMessage('user', text);
-    input.value = '';
-    const loadingId = showLoading();
-
-    setTimeout(() => {
-        try {
-            if(window.NexusBrain) {
-                const result = window.NexusBrain.analyze(text, activeModel);
-                removeLoading(loadingId);
-                
-                if(result.action && result.action !== "none") {
-                    document.body.className = result.action;
-                }
-                addMessage('bot', result.text);
-                saveHistory();
-            } else {
-                removeLoading(loadingId);
-                addMessage('bot', "Error: Sistema no disponible");
-            }
-        } catch(e) {
-            removeLoading(loadingId);
-            addMessage('bot', "Error al procesar: " + e.message);
-        }
-    }, 300);
-}
-
-function addMessage(role, content) {
+function addMessageToUI(role, content, save = true) {
     const win = document.getElementById('chat-window');
-    if(!win) return;
     const div = document.createElement('div');
     div.className = `bubble ${role}`;
-    win.appendChild(div);
-    
     if (role === 'bot') {
+        // Efecto máquina de escribir
         let i = 0;
         const speed = 10;
         div.innerHTML = "";
+        win.appendChild(div);
         function typeWriter() {
             if (i < content.length) {
                 let html = content.substring(0, i + 1);
@@ -419,15 +654,21 @@ function addMessage(role, content) {
             } else {
                 let finalHtml = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
                 div.innerHTML = finalHtml;
-                saveHistory();
+                if (save) addMessageToCurrent(role, content);
             }
         }
         typeWriter();
     } else {
         div.innerHTML = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        saveHistory();
+        win.appendChild(div);
+        win.scrollTop = win.scrollHeight;
+        if (save) addMessageToCurrent(role, content);
     }
-    win.scrollTop = win.scrollHeight;
+    if (role === 'user' && save) {
+        // Guardamos el mensaje del usuario en currentMessages (ya se añade en addMessageToCurrent)
+        // Pero addMessageToCurrent se llama dentro de typeWriter para bot, y para user lo llamamos aquí.
+        addMessageToCurrent(role, content);
+    }
 }
 
 function showLoading() {
@@ -447,35 +688,69 @@ function removeLoading(id) {
     if(el) el.remove();
 }
 
-function saveHistory() {
-    const chatWindow = document.getElementById('chat-window');
-    if(chatWindow) {
-        localStorage.setItem('nexus_storage_v2', chatWindow.innerHTML);
-    }
-}
+function handleSend() {
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
+    if(!text) return;
 
-function loadHistory() {
-    const saved = localStorage.getItem('nexus_storage_v2');
-    const chatWindow = document.getElementById('chat-window');
     const welcome = document.getElementById('big-welcome');
+    if(welcome) welcome.style.display = 'none';
+
+    // Mostrar mensaje de usuario inmediatamente
+    addMessageToUI('user', text, true);
+    input.value = '';
     
-    if(saved && saved.trim() !== "" && chatWindow) {
-        if(welcome) welcome.style.display = 'none';
-        chatWindow.innerHTML = saved;
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-    }
+    const loadingId = showLoading();
+    
+    setTimeout(() => {
+        try {
+            if(window.NexusBrain) {
+                const result = window.NexusBrain.analyze(text, activeModel);
+                removeLoading(loadingId);
+                if(result.action && result.action !== "none") {
+                    document.body.className = result.action;
+                }
+                addMessageToUI('bot', result.text, true);
+            } else {
+                removeLoading(loadingId);
+                addMessageToUI('bot', "Error: Sistema no disponible", true);
+            }
+        } catch(e) {
+            removeLoading(loadingId);
+            addMessageToUI('bot', "Error al procesar: " + e.message, true);
+        }
+    }, 300);
 }
 
-function clearChat() {
-    if(confirm("¿Reiniciar sistema? Se borrará el historial.")) {
-        localStorage.removeItem('nexus_storage_v2');
-        location.reload();
-    }
-}
-
-document.getElementById('user-input')?.addEventListener('keypress', (e) => { 
-    if(e.key === 'Enter') handleSend(); 
-});
+// Inicialización y eventos
+window.onload = () => {
+    setGreeting();
+    loadStorage();
+    
+    // Sidebar
+    const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menuBtn');
+    const closeBtn = document.getElementById('closeSidebar');
+    menuBtn.onclick = () => sidebar.classList.add('open');
+    closeBtn.onclick = () => sidebar.classList.remove('open');
+    document.addEventListener('click', (e) => {
+        if (!sidebar.contains(e.target) && e.target !== menuBtn && sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+        }
+    });
+    
+    document.getElementById('addModelBtn').onclick = () => {
+        const input = document.getElementById('newModelName');
+        addModel(input.value);
+        input.value = '';
+    };
+    document.getElementById('newConvBtn').onclick = () => newConversation();
+    document.getElementById('saveCurrentConvBtn').onclick = () => saveCurrentConversation();
+    
+    document.getElementById('user-input').addEventListener('keypress', (e) => {
+        if(e.key === 'Enter') handleSend();
+    });
+};
 </script>
 </body>
 </html>
