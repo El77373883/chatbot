@@ -1,44 +1,33 @@
-// database.js - Base de Datos de NexusCore
 const NexusDatabase = {
     "categorias": {
-        "saludos_horario": {
-            "claves": ["buenos dias", "buenas tardes", "buenas noches", "buen dia", "buena noche"],
-            "respuestas": [
-                "Saludos. He sincronizado mi reloj interno con tu jornada actual. ¿En qué puedo asistirte?",
-                "Detectando zona horaria... Saludos cordiales. Todos los sistemas están listos.",
-                "Entrada recibida. Espero que estés teniendo una excelente sesión de trabajo."
-            ]
-        },
-        "saludos_general": {
-            "claves": ["hola", "hey", "que tal", "activar", "bueno"],
-            "respuestas": [
-                "Sistemas NexusCore activos. ¿Qué análisis deseas ejecutar?",
-                "Hola. Conexión establecida con el núcleo lógico de procesamiento.",
-                "Núcleo en línea. Esperando instrucciones del usuario."
-            ]
+        "saludos": {
+            "claves": [
+                "hola", "buenos dias", "buenas tardes", "buenas noches", 
+                "buen dia", "hey", "que tal", "saludos", "noche", "dias", "tarde"
+            ],
+            "respuestas": {
+                "manana": "¡Buenos días! El sistema NexusCore ha despertado. ¿Qué análisis iniciamos hoy?",
+                "tarde": "Buenas tardes. Los motores están operando a temperatura óptima. ¿En qué te asisto?",
+                "noche": "Buenas noches. Iniciando protocolos de procesamiento nocturno. Estoy a tu disposición."
+            }
         },
         "minecraft": {
-            "claves": ["minecraft", "plugin", "spigot", "bukkit", "servidor", "java"],
+            "claves": ["minecraft", "server", "plugin", "spigot", "bukkit", "lag", "java"],
             "respuestas": [
-                "Analizando entorno de bloques... El módulo de desarrollo Java está listo para optimizar tu servidor.",
-                "¿Problemas con los plugins? Puedo ayudarte a revisar la carga de eventos en Spigot.",
-                "Recuerda que para evitar el lag, la pre-generación de chunks es vital."
-            ]
-        },
-        "identidad": {
-            "claves": ["quien eres", "tu nombre", "nexus", "creador"],
-            "respuestas": [
-                "Soy NexusCore AI, una interfaz modular diseñada para operar con máxima eficiencia en dispositivos móviles.",
-                "Mi nombre es NexusCore. Fui programado para gestionar tareas y análisis de datos en tiempo real."
+                "Analizando entorno de bloques... El módulo Java está listo.",
+                "Optimización detectada: Recomiendo revisar los 'Aikar's Flags' para tu servidor.",
+                "Si experimentas TPS bajos, revisa la entidad 'Ticking' en el archivo spigot.yml."
             ]
         }
     },
+    "motores": {
+        "Nexus-V3": "<b>[NEXUS V3 - STABLE]</b>",
+        "Nexus-V5": "<b>[NEXUS V5 - NEURAL PRO]</b>",
+        "Claude-V3": "<b>[CLAUDE V3 - CREATIVE]</b>"
+    },
     "default": [
         "Comando analizado. Sin coincidencias exactas en la base de datos local.",
-        "Entrada recibida, pero el núcleo lógico requiere más contexto para procesarla.",
-        "Analizando... No reconozco esa instrucción. Intenta preguntar sobre 'servidores' o 'saludos'."
+        "Analizando... Por favor, amplía la información para procesar la respuesta."
     ]
 };
-
-// Exportar al navegador
 window.NexusDatabase = NexusDatabase;
