@@ -35,10 +35,9 @@ const NexusBrain = {
             response = db.default[Math.floor(Math.random() * db.default.length)];
         }
 
-        const motorPrefix = db.motores[modelId] || `<b>[${modelId}]</b>`;
-        
+        // 5. Retornar solo el texto de la respuesta (sin prefijo extra)
         return {
-            text: `${motorPrefix}<br>${response}`,
+            text: response, // Ahora la respuesta ya trae el tag [NEXUS V5 PRO]
             action: action
         };
     }
