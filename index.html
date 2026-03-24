@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>NexusCore AI | soyadrianyt001</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome 6 (iconos profesionales) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root { 
@@ -83,7 +82,6 @@
         }
         .menu-btn:hover { color: var(--primary); }
 
-        /* Sidebar */
         .sidebar {
             position: fixed;
             top: 0;
@@ -181,11 +179,16 @@
         #chat-window { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; z-index: 10; scroll-behavior: smooth; }
 
         #big-welcome {
-            position: absolute;
-            top: 45%; left: 50%;
+            position: fixed;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
-            text-align: center; width: 90%; z-index: 5;
-            transition: all 0.6s ease;
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            z-index: 5;
+            transition: opacity 0.6s ease;
+            pointer-events: none;
         }
 
         .greeting {
@@ -263,6 +266,7 @@
             cursor: pointer;
             transition: 0.3s;
             color: white;
+            flex-shrink: 0;
         }
         .model-selector:hover {
             border-color: var(--primary);
@@ -276,6 +280,10 @@
             font-size: 13px;
             font-weight: 600;
             letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 110px;
         }
         .input-container {
             flex: 1;
@@ -366,7 +374,6 @@
             color: white;
         }
 
-        /* Botón de descarga */
         .download-btn {
             display: inline-block;
             margin-top: 12px;
@@ -401,7 +408,6 @@
     <div></div>
 </header>
 
-<!-- Sidebar -->
 <div id="sidebar" class="sidebar">
     <button class="close-btn" id="closeSidebar"><i class="fas fa-times"></i> Cerrar</button>
     <div>
@@ -542,7 +548,7 @@ window.NexusDatabase = {
     ]
 };
 
-// ==================== BRAIN.JS con generación de archivos ====================
+// ==================== BRAIN.JS ====================
 const NexusBrain = {
     analyze: function(input, modelId) {
         var msg = input.toLowerCase().trim();
@@ -565,7 +571,7 @@ const NexusBrain = {
             return { text: this.formatResponse(modelId, respuestaFinal), action: colorModo };
         }
 
-        // 2. GENERACIÓN DE ARCHIVOS (si el usuario lo pide explícitamente)
+        // 2. GENERACIÓN DE ARCHIVOS
         const downloadKeywords = ["genera un archivo", "descargar archivo", "crea un archivo", "dame el código en un archivo", "exporta", "guarda como archivo"];
         let isDownloadRequest = false;
         let downloadContent = "";
@@ -575,13 +581,11 @@ const NexusBrain = {
         for (let kw of downloadKeywords) {
             if (msg.includes(kw)) {
                 isDownloadRequest = true;
-                // Extraer contenido después de la palabra clave
                 let contentStart = input.indexOf(kw) + kw.length;
                 let rawContent = input.substring(contentStart).trim();
                 if (rawContent === "") {
                     respuestaFinal = "No especificaste el contenido del archivo. Escribe algo como: 'genera un archivo con este código: ...'";
                 } else {
-                    // Intentar detectar extensión por contexto
                     if (rawContent.includes("function") || rawContent.includes("var") || rawContent.includes("const") || rawContent.includes("console.log")) {
                         downloadFilename = "codigo.js";
                         downloadMime = "text/javascript";
@@ -667,7 +671,6 @@ let conversations = [];
 let currentConvId = null;
 let currentMessages = [];
 
-// Cargar datos guardados
 function loadStorage() {
     const savedModels = localStorage.getItem('nexus_models');
     if (savedModels) modelos = JSON.parse(savedModels);
@@ -721,7 +724,7 @@ function newConversation(title = null) {
     renderConversationsList();
     saveConversations();
     const welcome = document.getElementById('big-welcome');
-    if (welcome) welcome.style.display = 'flex';
+    if (welcome) welcome.style.opacity = "1";
 }
 
 function saveCurrentConversation() {
@@ -750,8 +753,8 @@ function loadConversation(id) {
         renderConversationsList();
         saveConversations();
         const welcome = document.getElementById('big-welcome');
-        if (welcome && currentMessages.length > 0) welcome.style.display = 'none';
-        else if (welcome && currentMessages.length === 0) welcome.style.display = 'flex';
+        if (welcome && currentMessages.length > 0) welcome.style.opacity = "0";
+        else if (welcome && currentMessages.length === 0) welcome.style.opacity = "1";
     }
 }
 
@@ -769,7 +772,7 @@ function deleteConversation(id) {
     renderConversationsList();
     renderChatFromMessages();
     const welcome = document.getElementById('big-welcome');
-    if (welcome && currentMessages.length === 0) welcome.style.display = 'flex';
+    if (welcome && currentMessages.length === 0) welcome.style.opacity = "1";
 }
 
 function addMessageToCurrent(role, content, downloadInfo = null) {
@@ -826,22 +829,20 @@ function renderChatFromMessages() {
     chatWindow.innerHTML = '';
     if (currentMessages.length === 0) {
         const welcome = document.getElementById('big-welcome');
-        if (welcome) welcome.style.display = 'flex';
+        if (welcome) welcome.style.opacity = "1";
         return;
     }
     const welcome = document.getElementById('big-welcome');
-    if (welcome) welcome.style.display = 'none';
+    if (welcome) welcome.style.opacity = "0";
     
     currentMessages.forEach(msg => {
         const div = document.createElement('div');
         div.className = `bubble ${msg.role}`;
         let contentHtml = msg.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
         if (msg.role === 'bot' && msg.download) {
-            // Crear botón de descarga
             const blob = new Blob([msg.download.content], { type: msg.download.mime });
             const url = URL.createObjectURL(blob);
             contentHtml += `<br><a class="download-btn" href="${url}" download="${msg.download.filename}"><i class="fas fa-download"></i> Descargar ${msg.download.filename}</a>`;
-            // Liberar URL después de un tiempo, pero se mantiene mientras se muestre
             setTimeout(() => URL.revokeObjectURL(url), 60000);
         }
         div.innerHTML = contentHtml;
@@ -939,7 +940,7 @@ function handleSend() {
     if(!text) return;
 
     const welcome = document.getElementById('big-welcome');
-    if(welcome) welcome.style.display = 'none';
+    if(welcome) welcome.style.opacity = "0";
 
     addMessageToUI('user', text, true);
     input.value = '';
