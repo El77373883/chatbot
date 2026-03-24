@@ -1,49 +1,57 @@
-const NexusBrain = {
-    async analyze(input, modelId) {
-        const msg = input.toLowerCase();
-        const db = window.NexusDatabase;
-        let response = "";
-        let action = "none";
-
-        // 1. Detectar Cambios de Interfaz
-        if (msg.includes("hacker") || msg.includes("matrix")) action = "hacker";
-        else if (msg.includes("epico") || msg.includes("fuego")) action = "epico";
-        else if (msg.includes("normal") || msg.includes("original") || msg.includes("resetear")) action = "normal";
-
-        // 2. Determinar momento del día
-        const hora = new Date().getHours();
-        let momento = (hora >= 6 && hora < 12) ? "manana" : (hora >= 12 && hora < 19) ? "tarde" : "noche";
-
-        // 3. Buscar respuesta en la base de datos
-        const esSaludo = db.categorias.saludos.claves.some(clave => msg.includes(clave));
-        
-        if (esSaludo) {
-            const lista = db.categorias.saludos.respuestas[momento];
-            response = lista[Math.floor(Math.random() * lista.length)];
-        } else {
-            for (let cat in db.categorias) {
-                if (db.categorias[cat].claves.some(clave => msg.includes(clave))) {
-                    const rList = db.categorias[cat].respuestas;
-                    response = rList[Math.floor(Math.random() * rList.length)];
-                    break;
-                }
+window.NexusDatabase = {
+    categorias: {
+        saludos: {
+            claves: ["hola", "buenas", "saludos", "hey", "que tal", "hello", "holi", "buen dia"],
+            respuestas: {
+                manana: [
+                    "¡Buenos días! ☀️ ¿En qué puedo ayudarte?",
+                    "¡Excelente mañana! ¿Qué necesitas procesar? 🚀",
+                    "Buen día, comandante. Todo listo para trabajar"
+                ],
+                tarde: [
+                    "¡Buenas tardes! 🌤️ ¿Cómo va tu día?",
+                    "Tarde productiva, ¿en qué te ayudo?",
+                    "Buenas tardes, sistema al 100%"
+                ],
+                noche: [
+                    "¡Buenas noches! 🌙 Descansa, yo trabajo por ti",
+                    "Noche activa, ¿qué deseas consultar?",
+                    "Buenas noches, listo para asistirte"
+                ]
             }
+        },
+        
+        minecraft: {
+            claves: ["minecraft", "diamante", "nether", "ender", "crafteo"],
+            respuestas: [
+                "🎮 En Minecraft, los diamantes se encuentran en Y=-58",
+                "⛏️ El Netherite es el material más fuerte del juego",
+                "🧱 Para craftear necesitas una mesa de trabajo"
+            ]
+        },
+        
+        roblox: {
+            claves: ["roblox", "adopt me", "brookhaven"],
+            respuestas: [
+                "🎮 Roblox tiene millones de juegos, ¿cuál te interesa?",
+                "🕹️ En Blox Fruits las mejores frutas son Leopardo y Dragón",
+                "🎲 Brookhaven es uno de los juegos más populares"
+            ]
+        },
+        
+        creador: {
+            claves: ["quien eres", "creador", "quien te creo"],
+            respuestas: [
+                "🤖 Soy NexusCore, creado por **soyadrianyt001**",
+                "⚡ Mi creador es soyadrianyt001, un desarrollador experto"
+            ]
         }
-
-        // 4. Fallback (Si no sabe qué decir)
-        if (!response) {
-            response = db.default[Math.floor(Math.random() * db.default.length)];
-        }
-
-        // --- DISEÑO PREMIUM Y PROFESIONAL ---
-        // Usamos etiquetas HTML para que el tag se vea separado y elegante
-        const tagHeader = `<strong style="color: var(--primary); letter-spacing: 1px;">[${modelId.toUpperCase()}]</strong><br>`;
-        const statusLine = `<span style="font-size: 10px; opacity: 0.6; text-transform: uppercase;">Sincronización Exitosa • Estado: Online</span><br><br>`;
-
-        return {
-            text: tagHeader + statusLine + response, 
-            action: action
-        };
-    }
+    },
+    
+    default: [
+        "Interesante... cuéntame más 🧠",
+        "No tengo información de eso aún",
+        "Procesando... ¿Puedes repetir?",
+        "Soy NexusCore, pregúntame sobre juegos o usa 'hola' para saludar"
+    ]
 };
-window.NexusBrain = NexusBrain;
