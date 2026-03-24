@@ -72,7 +72,7 @@
         .bot { background: var(--glass); align-self: flex-start; border: 1px solid var(--border); border-bottom-left-radius: 4px; }
         .user { background: linear-gradient(135deg, #6366f1, #4338ca); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
 
-        /* INDICADOR DE CARGA */
+        /* INDICADOR DE CARGA (PUNTITOS) */
         .typing-indicator { display: flex; gap: 4px; padding: 12px 15px; align-items: center; }
         .typing-indicator span { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
         .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
@@ -153,7 +153,7 @@
 <script>
     let activeModel = "Nexus V5";
 
-    // Inicialización
+    // Inicialización al cargar la ventana
     window.onload = () => {
         setGreeting();
         loadHistory();
@@ -178,26 +178,26 @@
         const text = input.value.trim();
         if(!text) return;
 
-        // Ocultar bienvenida
+        // Quitar la pantalla de bienvenida si es el primer mensaje
         const welcome = document.getElementById('big-welcome');
         if(welcome) {
             welcome.style.opacity = "0";
-            setTimeout(() => welcome.style.display = "none", 600);
+            setTimeout(() => { if(welcome) welcome.style.display = "none"; }, 600);
         }
 
         addMessage('user', text);
         input.value = '';
 
-        // Mostrar indicador de carga
+        // Efecto de carga
         const loadingId = showLoading();
 
-        // Simulación de respuesta IA
+        // Respuesta simulada (aquí podrías conectar una API real en el futuro)
         setTimeout(() => {
             removeLoading(loadingId);
-            const response = `Sincronización con **${activeModel}** exitosa. He recibido tu mensaje: "${text}". ¿Deseas que ejecute un análisis profundo?`;
+            const response = `**Sistema NexusCore [${activeModel}]:** Procesando datos... Se ha recibido la entrada: "${text}". ¿Deseas que proceda con la ejecución del script?`;
             addMessage('bot', response);
-            saveHistory();
-        }, 1500);
+            saveHistory(); // Guardamos el progreso
+        }, 1200);
     }
 
     function addMessage(role, content) {
@@ -205,7 +205,7 @@
         const div = document.createElement('div');
         div.className = `bubble ${role}`;
         
-        // Formateo simple de negritas
+        // Formateo de negritas (**texto**)
         const formatted = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         div.innerHTML = formatted;
         
@@ -216,7 +216,7 @@
     function showLoading() {
         const win = document.getElementById('chat-window');
         const loader = document.createElement('div');
-        loader.id = 'temp-loader';
+        loader.id = 'current-loading';
         loader.className = 'bubble bot typing-indicator';
         loader.innerHTML = '<span></span><span></span><span></span>';
         win.appendChild(loader);
@@ -229,14 +229,15 @@
         if(el) el.remove();
     }
 
+    // Persistencia: Guardar en el navegador
     function saveHistory() {
         const chat = document.getElementById('chat-window').innerHTML;
-        localStorage.setItem('nexus_history', chat);
+        localStorage.setItem('nexus_chat_v1', chat);
     }
 
     function loadHistory() {
-        const saved = localStorage.getItem('nexus_history');
-        if(saved) {
+        const saved = localStorage.getItem('nexus_chat_v1');
+        if(saved && saved.trim() !== "") {
             document.getElementById('big-welcome').style.display = 'none';
             document.getElementById('chat-window').innerHTML = saved;
             document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight;
@@ -244,10 +245,13 @@
     }
 
     function clearChat() {
-        localStorage.removeItem('nexus_history');
-        location.reload();
+        if(confirm("¿Estás seguro de que quieres borrar toda la memoria del chat?")) {
+            localStorage.removeItem('nexus_chat_v1');
+            location.reload();
+        }
     }
 
+    // Detectar Enter
     document.getElementById('user-input').onkeypress = (e) => { if(e.key === 'Enter') handleSend() };
 </script>
 </body>
