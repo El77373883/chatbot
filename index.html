@@ -31,7 +31,12 @@
             animation: auroraBg 15s ease infinite;
             color: var(--text); 
             margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+            transition: all 0.5s ease;
         }
+
+        /* MODOS VISUALES */
+        body.hacker { --primary: #00ff41; background: #000; }
+        body.epico { --primary: #ff4500; }
 
         header { 
             padding: 15px 20px; 
@@ -71,10 +76,8 @@
         .bot { background: var(--glass); align-self: flex-start; border: 1px solid var(--border); border-bottom-left-radius: 4px; }
         .user { background: linear-gradient(135deg, #6366f1, #4338ca); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
 
-        /* CARGADOR PREMIUM CIRCULAR */
         .premium-loader {
-            width: 24px;
-            height: 24px;
+            width: 24px; height: 24px;
             border: 3px solid rgba(99, 102, 241, 0.2);
             border-top: 3px solid var(--primary);
             border-radius: 50%;
@@ -90,47 +93,16 @@
             backdrop-filter: blur(20px); z-index: 100;
         }
 
-        .model-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            padding: 0 10px;
-        }
-
-        .model-bar { 
-            display: flex; 
-            gap: 8px; 
-            overflow-x: auto; 
-            padding-bottom: 5px;
-            flex: 1;
-            scrollbar-width: none; 
-        }
+        .model-container { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding: 0 10px; }
+        .model-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; flex: 1; scrollbar-width: none; }
         .model-bar::-webkit-scrollbar { display: none; }
 
         .model-chip {
-            background: rgba(255,255,255,0.05); 
-            border: 1px solid var(--border);
-            color: #94a3b8; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            font-size: 10px;
-            font-weight: 700; 
-            cursor: pointer; 
-            transition: 0.3s;
-            white-space: nowrap;
-            text-transform: uppercase;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            color: #94a3b8; padding: 8px 16px; border-radius: 20px; font-size: 10px;
+            font-weight: 700; cursor: pointer; transition: 0.3s; white-space: nowrap; text-transform: uppercase;
         }
-        .model-chip.active { 
-            background: var(--primary); 
-            color: white; 
-            border-color: var(--primary); 
-            box-shadow: 0 0 15px var(--primary-glow); 
-        }
-
-        .toolbar { display: flex; gap: 20px; margin-bottom: 12px; padding-left: 15px; }
-        .tool-icon { color: #94a3b8; cursor: pointer; transition: 0.3s; }
-        .tool-icon:hover { color: var(--primary); }
+        .model-chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
 
         .input-container { 
             background: rgba(0, 0, 0, 0.4); border-radius: 28px; display: flex; 
@@ -138,12 +110,7 @@
             margin: 0 10px;
         }
         input { flex: 1; background: transparent; border: none; color: white; padding: 12px 0; font-size: 16px; outline: none; }
-        
-        .send-btn { 
-            background: var(--primary); color: white; border: none; 
-            width: 44px; height: 44px; border-radius: 50%; display: flex; 
-            align-items: center; justify-content: center; cursor: pointer; transition: 0.3s;
-        }
+        .send-btn { background: var(--primary); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } }
     </style>
@@ -170,11 +137,6 @@
         <button onclick="clearChat()" style="background:rgba(239, 68, 68, 0.1); border:1px solid rgba(239, 68, 68, 0.2); color:#ef4444; padding: 8px 12px; border-radius: 12px; font-size:9px; font-weight:700; cursor:pointer;">RESETEAR</button>
     </div>
 
-    <div class="toolbar">
-        <span class="tool-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
-        <span class="tool-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg></span>
-    </div>
-
     <div class="input-container">
         <input type="text" id="user-input" placeholder="Escribe un mensaje..." autocomplete="off">
         <button class="send-btn" onclick="handleSend()">
@@ -183,15 +145,17 @@
     </div>
 </div>
 
+<script src="database.js"></script>
+<script src="brain.js"></script>
+
 <script>
     let activeModel = "Nexus V5 PRO";
     const modelos = [
-        { name: "Nexus V5 PRO", type: "pro" },
-        { name: "Nexus V4 ULTRA", type: "pro" },
-        { name: "Nexus V3 Lite", type: "std" },
-        { name: "Core Engine X", type: "pro" },
-        { name: "Nexus Data Miner", type: "std" },
-        { name: "CyberVision 2.0", type: "pro" }
+        { name: "Nexus V5 PRO" },
+        { name: "Nexus V4 ULTRA" },
+        { name: "Nexus V3 Lite" },
+        { name: "Core Engine X" },
+        { name: "CyberVision 2.0" }
     ];
 
     window.onload = () => {
@@ -225,7 +189,7 @@
         activeModel = modelName;
     }
 
-    function handleSend() {
+    async function handleSend() {
         const input = document.getElementById('user-input');
         const text = input.value.trim();
         if(!text) return;
@@ -240,11 +204,16 @@
         input.value = '';
         const loadingId = showLoading();
 
-        setTimeout(() => {
-            removeLoading(loadingId);
-            const response = `**Terminal [${activeModel}]:** Análisis completado. El comando "${text}" ha sido procesado en la red Nexus. ¿Alguna otra instrucción?`;
-            addMessage('bot', response);
-        }, 1500);
+        // AQUÍ CONECTAMOS CON BRAIN.JS PARA QUITAR EL "TERMINAL" VIEJO
+        if(window.NexusBrain) {
+            const result = await window.NexusBrain.analyze(text, activeModel);
+            
+            setTimeout(() => {
+                removeLoading(loadingId);
+                if(result.action !== "none") document.body.className = result.action;
+                addMessage('bot', result.text);
+            }, 1200);
+        }
     }
 
     function addMessage(role, content) {
@@ -258,12 +227,12 @@
             const speed = 15; 
             function typeWriter() {
                 if (i < content.length) {
-                    let textSoFar = content.substring(0, i + 1);
-                    div.innerHTML = textSoFar.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    div.innerHTML = content.substring(0, i + 1).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
                     i++;
                     win.scrollTop = win.scrollHeight;
                     setTimeout(typeWriter, speed);
                 } else {
+                    div.innerHTML = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/`(.*?)`/g, '<code>$1</code>');
                     saveHistory();
                 }
             }
@@ -291,8 +260,7 @@
     }
 
     function saveHistory() {
-        const chat = document.getElementById('chat-window').innerHTML;
-        localStorage.setItem('nexus_storage_v2', chat);
+        localStorage.setItem('nexus_storage_v2', document.getElementById('chat-window').innerHTML);
     }
 
     function loadHistory() {
@@ -306,7 +274,7 @@
     }
 
     function clearChat() {
-        if(confirm("¿Reiniciar sistema y borrar logs?")) {
+        if(confirm("¿Reiniciar sistema?")) {
             localStorage.removeItem('nexus_storage_v2');
             location.reload();
         }
