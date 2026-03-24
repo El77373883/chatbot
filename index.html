@@ -71,12 +71,18 @@
         .bot { background: var(--glass); align-self: flex-start; border: 1px solid var(--border); border-bottom-left-radius: 4px; }
         .user { background: linear-gradient(135deg, #6366f1, #4338ca); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
 
-        .typing-indicator { display: flex; gap: 4px; padding: 12px 15px; align-items: center; }
-        .typing-indicator span { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        /* CARGADOR PREMIUM CIRCULAR */
+        .premium-loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(99, 102, 241, 0.2);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 5px;
+        }
 
-        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .bottom-controls {
             background: var(--glass); border-top: 1px solid var(--border);
@@ -84,7 +90,6 @@
             backdrop-filter: blur(20px); z-index: 100;
         }
 
-        /* BARRA DE MODELOS MEJORADA */
         .model-container {
             display: flex;
             align-items: center;
@@ -99,9 +104,9 @@
             overflow-x: auto; 
             padding-bottom: 5px;
             flex: 1;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none; 
         }
-        .model-bar::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
+        .model-bar::-webkit-scrollbar { display: none; }
 
         .model-chip {
             background: rgba(255,255,255,0.05); 
@@ -161,8 +166,7 @@
 
 <div class="bottom-controls">
     <div class="model-container">
-        <div class="model-bar" id="model-list">
-            </div>
+        <div class="model-bar" id="model-list"></div>
         <button onclick="clearChat()" style="background:rgba(239, 68, 68, 0.1); border:1px solid rgba(239, 68, 68, 0.2); color:#ef4444; padding: 8px 12px; border-radius: 12px; font-size:9px; font-weight:700; cursor:pointer;">RESETEAR</button>
     </div>
 
@@ -240,29 +244,45 @@
             removeLoading(loadingId);
             const response = `**Terminal [${activeModel}]:** Análisis completado. El comando "${text}" ha sido procesado en la red Nexus. ¿Alguna otra instrucción?`;
             addMessage('bot', response);
-            saveHistory();
-        }, 1300);
+        }, 1500);
     }
 
     function addMessage(role, content) {
         const win = document.getElementById('chat-window');
         const div = document.createElement('div');
         div.className = `bubble ${role}`;
-        const formatted = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        div.innerHTML = formatted;
         win.appendChild(div);
+        
+        if (role === 'bot') {
+            let i = 0;
+            const speed = 15; 
+            function typeWriter() {
+                if (i < content.length) {
+                    let textSoFar = content.substring(0, i + 1);
+                    div.innerHTML = textSoFar.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    i++;
+                    win.scrollTop = win.scrollHeight;
+                    setTimeout(typeWriter, speed);
+                } else {
+                    saveHistory();
+                }
+            }
+            typeWriter();
+        } else {
+            div.innerHTML = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        }
         win.scrollTop = win.scrollHeight;
     }
 
     function showLoading() {
         const win = document.getElementById('chat-window');
-        const loader = document.createElement('div');
-        loader.id = 'current-loading';
-        loader.className = 'bubble bot typing-indicator';
-        loader.innerHTML = '<span></span><span></span><span></span>';
-        win.appendChild(loader);
+        const loaderDiv = document.createElement('div');
+        loaderDiv.id = 'current-loading';
+        loaderDiv.className = 'bubble bot';
+        loaderDiv.innerHTML = '<div class="premium-loader"></div>';
+        win.appendChild(loaderDiv);
         win.scrollTop = win.scrollHeight;
-        return loader.id;
+        return loaderDiv.id;
     }
 
     function removeLoading(id) {
@@ -278,7 +298,8 @@
     function loadHistory() {
         const saved = localStorage.getItem('nexus_storage_v2');
         if(saved) {
-            document.getElementById('big-welcome').style.display = 'none';
+            const welcome = document.getElementById('big-welcome');
+            if(welcome) welcome.style.display = 'none';
             document.getElementById('chat-window').innerHTML = saved;
             document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight;
         }
