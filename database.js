@@ -4,51 +4,47 @@ const NexusDatabase = {
             "claves": ["hola", "buenos dias", "buenas tardes", "buenas noches", "hey", "que tal", "saludos", "noche", "dias", "tarde", "hola nexus", "holi"],
             "respuestas": {
                 "manana": [
-                    "¡Buenos días! El sistema NexusCore ha despertado. ¿Qué análisis iniciamos hoy?",
-                    "¡Buen día! Todos los módulos están cargados. ¿En qué puedo ayudarte?",
-                    "Hola. He sincronizado tus tareas matutinas. ¿Listo para programar?"
+                    "**[NEXUS V5 PRO]** Módulos matutinos sincronizados. ¿Qué análisis iniciamos?",
+                    "**[NEXUS V5 PRO]** Núcleo activo. Esperando instrucciones de procesamiento.",
+                    "**[NEXUS V5 PRO]** Sistema operativo en línea. ¿Listo para programar?"
                 ],
                 "tarde": [
-                    "Buenas tardes. Los motores están operando a temperatura óptima. ¿En qué te asisto?",
-                    "Hola, espero que tu tarde esté siendo productiva. ¿Qué procesamos?",
-                    "Buenas tardes. Sistema en línea. ¿Necesitas optimizar algo?"
+                    "**[NEXUS V5 PRO]** Motores operativos. ¿En qué te asisto esta tarde?",
+                    "**[NEXUS V5 PRO]** Interfaz optimizada. ¿Qué datos procesamos?",
+                    "**[NEXUS V5 PRO]** Conexión estable. Esperando tu comando."
                 ],
                 "noche": [
-                    "Buenas noches. Iniciando protocolos de procesamiento nocturno. Estoy a tu disposición.",
-                    "Hola. ¿Trabajando hasta tarde? Me quedaré despierto contigo.",
-                    "Buenas noches. Modo nocturno activado (Glass UI). ¿Qué necesitas?"
+                    "**[NEXUS V5 PRO]** Protocolos nocturnos activos. Procesador a tu disposición.",
+                    "**[NEXUS V5 PRO]** Modo oscuro sincronizado. ¿Qué necesitas optimizar?",
+                    "**[NEXUS V5 PRO]** Sistema en espera. ¿Iniciamos el análisis nocturno?"
                 ]
             }
         },
         "modos_visuales": {
             "claves": ["modo hacker", "modo matrix", "modo epico", "modo fuego", "modo normal", "modo original", "resetear tema", "limpiar pantalla"],
             "respuestas": [
-                "Ejecutando protocolo de reconfiguración visual...",
-                "Sincronizando interfaz con el nuevo espectro de color.",
-                "Cambio de skin completado. ¿Qué te parece el nuevo aspecto?",
-                "Interfaz NexusCore actualizada con éxito. ¿Alguna otra instrucción?"
+                "**[NEXUS V5 PRO]** Reconfigurando interfaz visual...",
+                "**[NEXUS V5 PRO]** Sincronizando nuevo espectro de color.",
+                "**[NEXUS V5 PRO]** Cambio de skin completado.",
+                "**[NEXUS V5 PRO]** Interfaz actualizada con éxito."
             ]
         },
         "minecraft": {
             "claves": ["minecraft", "server", "plugin", "spigot", "bukkit", "lag", "java", "ram", "tps"],
             "respuestas": [
-                "Analizando entorno de bloques... El módulo Java está listo.",
-                "Optimización detectada: Recomiendo revisar los 'Aikar's Flags' para tu servidor.",
-                "Si experimentas TPS bajos, revisa la entidad 'Ticking' en el archivo spigot.yml.",
-                "¿Mucho lag? Prueba a reducir la 'view-distance' en server.properties."
+                "**[NEXUS V5 PRO]** Módulo Java operativo. Analizando entorno de bloques.",
+                "**[NEXUS V5 PRO]** Optimización: Recomiendo revisar 'Aikar's Flags'.",
+                "**[NEXUS V5 PRO]** Alerta de TPS: Revisa la entidad 'Ticking' en spigot.yml.",
+                "**[NEXUS V5 PRO]** Latencia detectada: Reduce 'view-distance' en server.properties."
             ]
         }
     },
-    "motores": {
-        "Nexus-V3": "<b>[NEXUS V3 - STABLE]</b>",
-        "Nexus-V5": "<b>[NEXUS V5 - NEURAL PRO]</b>",
-        "Claude-V3": "<b>[CLAUDE V3 - CREATIVE]</b>"
-    },
+    // Eliminamos la sección de motores, ya que el tag lo ponemos directo en la respuesta
     "default": [
-        "Comando analizado. Sin coincidencias exactas en la base de datos local.",
-        "Analizando... Por favor, amplía la información para procesar la respuesta.",
-        "Interesante... Mi base de datos aún no tiene una respuesta para eso.",
-        "Error 404: Respuesta no encontrada, pero sigo aquí para intentarlo de nuevo."
+        "**[NEXUS V5 PRO]** Comando analizado. Sin coincidencias en base de datos local.",
+        "**[NEXUS V5 PRO]** Analizando... Amplía la información para procesar.",
+        "**[NEXUS V5 PRO]** Interesante... Base de datos sin respuesta registrada.",
+        "**[NEXUS V5 PRO]** Error 404: Respuesta no encontrada. Reintenta."
     ]
 };
 window.NexusDatabase = NexusDatabase;
