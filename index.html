@@ -46,8 +46,6 @@
 
         .brand { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; cursor: pointer; }
         .brand span { color: var(--primary); }
-        .creator-tag { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700; }
-        .creator-tag span { color: var(--primary); }
 
         /* Menú hamburguesa */
         .menu-btn {
@@ -215,6 +213,21 @@
             border-radius: 6px;
             font-family: monospace;
         }
+
+        /* Footer con el creador */
+        .footer-creator {
+            text-align: center;
+            font-size: 10px;
+            color: #64748b;
+            padding: 8px;
+            background: rgba(0,0,0,0.3);
+            border-top: 1px solid var(--border);
+            letter-spacing: 0.5px;
+        }
+        .footer-creator span {
+            color: var(--primary);
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -224,7 +237,6 @@
         <button class="menu-btn" id="menuBtn">☰</button>
         <div class="brand-container">
             <div class="brand">NEXUS<span>CORE</span></div>
-            <span class="creator-tag">CREADOR: <span>SOYADRIANYT001</span></span>
         </div>
     </div>
     <div></div>
@@ -267,6 +279,10 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
         </button>
     </div>
+</div>
+
+<div class="footer-creator">
+    CREADOR: <span>SOYADRIANYT001</span>
 </div>
 
 <script>
@@ -663,11 +679,6 @@ function addMessageToUI(role, content, save = true) {
         win.appendChild(div);
         win.scrollTop = win.scrollHeight;
         if (save) addMessageToCurrent(role, content);
-    }
-    if (role === 'user' && save) {
-        // Guardamos el mensaje del usuario en currentMessages (ya se añade en addMessageToCurrent)
-        // Pero addMessageToCurrent se llama dentro de typeWriter para bot, y para user lo llamamos aquí.
-        addMessageToCurrent(role, content);
     }
 }
 
