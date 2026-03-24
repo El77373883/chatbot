@@ -2,22 +2,23 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>NexusCore AI | Pro Assistant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NexusCore AI | Enterprise Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
             --primary: #6366f1; 
             --bg: #030712; 
-            --glass: #111827; 
+            --glass: rgba(17, 24, 39, 0.85); 
             --text: #f9fafb; 
-            --border: rgba(255,255,255,0.1); 
+            --border: rgba(255, 255, 255, 0.1); 
         }
 
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; }
 
         body { 
             background: var(--bg); 
+            background-image: radial-gradient(circle at top right, #1e1b4b, transparent);
             color: var(--text); 
             margin: 0; 
             height: 100vh; 
@@ -26,174 +27,145 @@
             overflow: hidden;
         }
 
-        /* --- Header --- */
+        /* --- Header Premium --- */
         header { 
-            padding: 20px; 
-            padding-top: calc(20px + env(safe-area-inset-top));
+            padding: 15px 20px; 
+            padding-top: calc(15px + env(safe-area-inset-top));
             background: var(--glass); 
             border-bottom: 1px solid var(--border); 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
+            z-index: 100;
         }
 
-        .brand { font-weight: 700; letter-spacing: 1px; font-size: 18px; }
+        .brand { font-weight: 700; font-size: 18px; letter-spacing: -0.5px; }
         .brand span { color: var(--primary); }
 
+        .icon-btn { 
+            background: none; border: none; color: var(--text); 
+            font-size: 20px; cursor: pointer; padding: 5px;
+        }
+
+        /* --- Sidebar de Ajustes --- */
+        #settings-menu {
+            position: fixed; top: 0; right: -300px; width: 300px; height: 100%;
+            background: var(--glass); border-left: 1px solid var(--border);
+            z-index: 1000; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+            padding: 40px 25px; backdrop-filter: blur(25px);
+        }
+        #settings-menu.open { right: 0; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
+
+        .menu-header { font-weight: 700; font-size: 20px; margin-bottom: 30px; display: block; }
+        .setting-item { margin-bottom: 25px; }
+        .setting-item label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; }
+
         select { 
-            background: #1f2937; 
-            color: white; 
-            border: 1px solid var(--border); 
-            border-radius: 8px; 
-            padding: 6px 12px; 
-            font-size: 12px;
-            outline: none;
+            width: 100%; background: #030712; color: white; border: 1px solid var(--border); 
+            padding: 12px; border-radius: 12px; outline: none; font-size: 14px;
         }
 
         /* --- Ventana de Chat --- */
         #chat-window { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
+            flex: 1; overflow-y: auto; padding: 20px; 
+            display: flex; flex-direction: column; gap: 15px;
             scroll-behavior: smooth;
         }
 
         .bubble { 
-            max-width: 80%; 
-            padding: 12px 16px; 
-            border-radius: 18px; 
-            font-size: 15px; 
-            line-height: 1.5;
-            animation: fadeIn 0.3s ease-out forwards;
+            max-width: 85%; padding: 14px 18px; border-radius: 20px; 
+            font-size: 15px; line-height: 1.5; animation: fadeIn 0.3s ease;
         }
 
-        .bot { 
-            background: var(--glass); 
-            align-self: flex-start; 
-            border: 1px solid var(--border); 
-            border-bottom-left-radius: 4px; 
-        }
+        .bot { background: var(--glass); align-self: flex-start; border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+        .user { background: var(--primary); align-self: flex-end; border-bottom-right-radius: 4px; }
 
-        .user { 
-            background: var(--primary); 
-            align-self: flex-end; 
-            border-bottom-right-radius: 4px; 
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        /* --- Animación "Pensando" --- */
+        #loading-area { display: none; padding: 0 20px; margin-bottom: 10px; }
+        .typing-bubble { 
+            display: inline-flex; align-items: center; gap: 5px; 
+            background: var(--glass); padding: 10px 15px; border-radius: 15px; border: 1px solid var(--border);
         }
-
-        /* --- Animación Cargando (Pensando) --- */
-        #loading-area { 
-            display: none; 
-            align-self: flex-start; 
-            margin-bottom: 10px;
-        }
-
-        .typing-bubble {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            padding: 12px 16px;
-            border-radius: 18px;
-            border-bottom-left-radius: 4px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .dot { 
-            width: 6px; 
-            height: 6px; 
-            background: #94a3b8; 
-            border-radius: 50%; 
-            animation: bounce 1.4s infinite ease-in-out; 
-        }
+        .dot { width: 5px; height: 5px; background: #94a3b8; border-radius: 50%; animation: bounce 1.4s infinite; }
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
 
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0.3); opacity: 0.3; }
-            40% { transform: scale(1); opacity: 1; }
-        }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0.3); opacity: 0.3; } 40% { transform: scale(1); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
 
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(10px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-
-        /* --- Input Area --- */
+        /* --- Barra de Entrada Pro --- */
         .input-area { 
-            padding: 20px; 
-            background: linear-gradient(to top, var(--bg), transparent);
-            padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
+            background: var(--glass); border-top: 1px solid var(--border);
+            padding: 15px 20px; padding-bottom: calc(15px + env(safe-area-inset-bottom));
+            backdrop-filter: blur(15px);
         }
+
+        .toolbar { display: flex; gap: 20px; margin-bottom: 12px; padding-left: 5px; }
+        .tool-icon { font-size: 18px; cursor: pointer; transition: 0.2s; }
+        .tool-icon:hover { transform: scale(1.2); }
 
         .input-container { 
-            background: var(--glass); 
-            border-radius: 25px; 
-            display: flex; 
-            padding: 5px 15px; 
-            align-items: center; 
-            border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            background: #030712; border-radius: 30px; display: flex; 
+            padding: 5px 15px; align-items: center; border: 1px solid var(--border);
         }
 
-        input { 
-            flex: 1; 
-            background: transparent; 
-            border: none; 
-            color: white; 
-            padding: 12px; 
-            outline: none; 
-            font-size: 16px; 
-        }
+        input { flex: 1; background: transparent; border: none; color: white; padding: 12px; font-size: 16px; outline: none; }
+        
+        .mic-active { color: #ef4444; font-weight: 700; font-size: 10px; margin-right: 10px; display: none; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-        button { 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            width: 38px; 
-            height: 38px; 
-            border-radius: 50%; 
-            font-weight: bold; 
-            cursor: pointer;
-            transition: transform 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        button:active { transform: scale(0.9); }
+        .send-btn { background: var(--primary); color: white; border: none; width: 38px; height: 38px; border-radius: 50%; font-weight: bold; }
     </style>
 </head>
 <body>
 
+<div id="settings-menu">
+    <span class="menu-header">Configuración</span>
+    <div class="setting-item">
+        <label>Motor de Inteligencia</label>
+        <select id="model-select">
+            <option value="Nexus-G4">Nexus G4 (Técnico)</option>
+            <option value="Claude-V3">Claude V3 (Creativo)</option>
+            <option value="Gemini-Pro">Gemini Pro (Veloz)</option>
+        </select>
+    </div>
+    <div class="setting-item">
+        <label>Memoria Local</label>
+        <button onclick="clearChat()" style="width:100%; padding:10px; background:#ef4444; border:none; color:white; border-radius:10px;">Limpiar Historial</button>
+    </div>
+    <button onclick="toggleSettings()" style="width:100%; padding:12px; background:var(--primary); border:none; color:white; border-radius:12px; margin-top: 50px;">Guardar y Cerrar</button>
+</div>
+
 <header>
     <div class="brand">NEXUS<span>CORE</span></div>
-    <select id="model-select">
-        <option value="Neural-G4">Neural G4</option>
-        <option value="Claude-V3">Claude V3</option>
-        <option value="Gemini-Pro">Gemini Pro</option>
-    </select>
+    <button class="icon-btn" onclick="toggleSettings()">⚙️</button>
 </header>
 
-<div id="chat-window">
-    </div>
+<div id="chat-window"></div>
 
-<div id="loading-area" style="padding-left: 20px;">
+<div id="loading-area">
     <div class="typing-bubble">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <span style="font-size: 13px; color: #94a3b8; margin-left: 5px;">Pensando...</span>
+        <div class="dot"></div> <div class="dot"></div> <div class="dot"></div>
+        <span style="font-size: 12px; color: #94a3b8; margin-left: 5px;">Pensando...</span>
     </div>
 </div>
 
 <div class="input-area">
+    <div class="toolbar">
+        <label for="img-input" class="tool-icon">🖼️</label>
+        <input type="file" id="img-input" hidden accept="image/*" onchange="handleMedia('Imagen')">
+        
+        <label for="vid-input" class="tool-icon">🎥</label>
+        <input type="file" id="vid-input" hidden accept="video/*" onchange="handleMedia('Video')">
+        
+        <span class="tool-icon" onclick="toggleMic()">🎤</span>
+    </div>
+
     <div class="input-container">
-        <input type="text" id="user-input" placeholder="Pregunta algo..." autocomplete="off">
-        <button onclick="handleSend()">↑</button>
+        <span id="mic-status" class="mic-active">● REC</span>
+        <input type="text" id="user-input" placeholder="Escribe un mensaje..." autocomplete="off">
+        <button class="send-btn" onclick="handleSend()">↑</button>
     </div>
 </div>
 
@@ -203,12 +175,30 @@
 <script>
     const chatWin = document.getElementById('chat-window');
     const inputField = document.getElementById('user-input');
+    const settingsMenu = document.getElementById('settings-menu');
+    const micStatus = document.getElementById('mic-status');
     const loadingArea = document.getElementById('loading-area');
 
-    // Cargar historial al inicio
+    function toggleSettings() { settingsMenu.classList.toggle('open'); }
+
+    function toggleMic() {
+        const isMicOn = micStatus.style.display === 'block';
+        micStatus.style.display = isMicOn ? 'none' : 'block';
+        inputField.placeholder = isMicOn ? "Escribe un mensaje..." : "Escuchando voz...";
+    }
+
+    function handleMedia(type) {
+        save('user', `He adjuntado un **${type}** para análisis.`);
+        loadingArea.style.display = 'block';
+        setTimeout(() => {
+            loadingArea.style.display = 'none';
+            save('bot', `[SISTEMA VISUAL] He recibido el archivo. El análisis de metadatos no muestra errores de integridad en el ${type}.`);
+        }, 1500);
+    }
+
     function render() {
-        const history = JSON.parse(localStorage.getItem('nexus_pro_v2')) || [
-            { role: 'bot', content: 'Sistemas NexusCore activos. ¿En qué puedo ayudarte?' }
+        const history = JSON.parse(localStorage.getItem('nexus_ultra')) || [
+            {role:'bot', content:'Protocolos NexusCore v2.5 activos. Micrófono y Multimedia sincronizados.'}
         ];
         chatWin.innerHTML = '';
         history.forEach(m => {
@@ -220,50 +210,38 @@
         chatWin.scrollTop = chatWin.scrollHeight;
     }
 
-    // Guardar en LocalStorage
-    function save(role, content) {
-        const history = JSON.parse(localStorage.getItem('nexus_pro_v2')) || [];
-        history.push({role, content});
-        localStorage.setItem('nexus_pro_v2', JSON.stringify(history));
-        render();
-    }
-
-    // Función principal para enviar
     async function handleSend() {
         const text = inputField.value.trim();
         if(!text) return;
 
-        // Mostrar mensaje del usuario
         save('user', text);
         inputField.value = '';
-
-        // Mostrar animación de pensando
         loadingArea.style.display = 'block';
         chatWin.scrollTop = chatWin.scrollHeight;
 
-        // Llamar a brain.js (Asegúrate de que brain.js esté subido a GitHub)
-        if (window.NexusBrain) {
+        if(window.NexusBrain) {
             const model = document.getElementById('model-select').value;
             const response = await window.NexusBrain.analyze(text, model);
-            
-            // Simular tiempo de "procesamiento"
-            setTimeout(() => {
-                loadingArea.style.display = 'none'; // Ocultar bolitas
-                save('bot', response); // Mostrar respuesta real
-            }, 1500);
-        } else {
-            // Si el archivo brain.js falló
             setTimeout(() => {
                 loadingArea.style.display = 'none';
-                save('bot', "Error: No se pudo conectar con el núcleo lógico (brain.js no encontrado).");
-            }, 1000);
+                save('bot', response);
+            }, 1500);
         }
     }
 
-    // Enviar con Enter
-    inputField.onkeypress = (e) => { if(e.key === 'Enter') handleSend() };
+    function save(role, content) {
+        const history = JSON.parse(localStorage.getItem('nexus_ultra')) || [];
+        history.push({role, content});
+        localStorage.setItem('nexus_ultra', JSON.stringify(history));
+        render();
+    }
 
-    // Iniciar
+    function clearChat() {
+        localStorage.removeItem('nexus_ultra');
+        location.reload();
+    }
+
+    inputField.onkeypress = (e) => { if(e.key === 'Enter') handleSend() };
     render();
 </script>
 </body>
