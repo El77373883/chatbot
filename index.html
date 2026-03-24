@@ -2,180 +2,214 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NexusCore AI | Terminal v2.0</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>NexusCore AI | Pro Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #6366f1;
-            --accent: #818cf8;
-            --bg: #030712;
-            --glass: rgba(17, 24, 39, 0.8);
-            --border: rgba(255, 255, 255, 0.1);
-            --text: #f9fafb;
+        :root { 
+            --primary: #6366f1; 
+            --bg: #030712; 
+            --glass: #111827; 
+            --text: #f9fafb; 
+            --border: rgba(255,255,255,0.1); 
         }
 
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
 
-        body {
-            background-color: var(--bg);
-            background-image: radial-gradient(circle at top right, #1e1b4b, transparent);
-            color: var(--text);
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
             overflow: hidden;
         }
 
-        /* --- Header Estilo iOS --- */
-        header {
-            padding: 20px;
+        /* --- Header --- */
+        header { 
+            padding: 20px; 
             padding-top: calc(20px + env(safe-area-inset-top));
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
+            background: var(--glass); 
+            border-bottom: 1px solid var(--border); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            backdrop-filter: blur(10px);
         }
 
-        .brand { display: flex; align-items: center; gap: 8px; }
-        .logo-icon { width: 12px; height: 12px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); }
-        .brand b { letter-spacing: 1px; font-size: 14px; text-transform: uppercase; }
+        .brand { font-weight: 700; letter-spacing: 1px; font-size: 18px; }
+        .brand span { color: var(--primary); }
 
-        select {
-            background: #111827;
-            color: #fff;
-            border: 1px solid var(--border);
-            padding: 8px 12px;
-            border-radius: 10px;
+        select { 
+            background: #1f2937; 
+            color: white; 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            padding: 6px 12px; 
             font-size: 12px;
             outline: none;
-            cursor: pointer;
         }
 
-        /* --- Chat Display --- */
-        #chat-window {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            padding-bottom: 160px; /* Espacio para el input */
+        /* --- Ventana de Chat --- */
+        #chat-window { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            scroll-behavior: smooth;
         }
 
-        .bubble {
-            max-width: 80%;
-            padding: 14px 18px;
-            border-radius: 20px;
-            font-size: 15px;
-            line-height: 1.6;
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        .bubble { 
+            max-width: 80%; 
+            padding: 12px 16px; 
+            border-radius: 18px; 
+            font-size: 15px; 
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease-out forwards;
         }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .bot { background: var(--glass); border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
-        .user { background: var(--primary); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
-
-        /* --- Input Bar Pro --- */
-        .input-area {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            padding: 20px;
-            padding-bottom: calc(20px + env(safe-area-inset-bottom));
-            background: linear-gradient(to top, var(--bg), transparent);
+        .bot { 
+            background: var(--glass); 
+            align-self: flex-start; 
+            border: 1px solid var(--border); 
+            border-bottom-left-radius: 4px; 
         }
 
-        .input-container {
+        .user { 
+            background: var(--primary); 
+            align-self: flex-end; 
+            border-bottom-right-radius: 4px; 
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        /* --- Animación Cargando (Pensando) --- */
+        #loading-area { 
+            display: none; 
+            align-self: flex-start; 
+            margin-bottom: 10px;
+        }
+
+        .typing-bubble {
             background: var(--glass);
-            backdrop-filter: blur(20px);
             border: 1px solid var(--border);
-            border-radius: 24px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
             display: flex;
             align-items: center;
-            padding: 6px 16px;
-            gap: 10px;
+            gap: 6px;
         }
 
-        input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            padding: 12px 0;
-            font-size: 16px;
-            outline: none;
+        .dot { 
+            width: 6px; 
+            height: 6px; 
+            background: #94a3b8; 
+            border-radius: 50%; 
+            animation: bounce 1.4s infinite ease-in-out; 
+        }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.3); opacity: 0.3; }
+            40% { transform: scale(1); opacity: 1; }
         }
 
-        .send-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* --- Input Area --- */
+        .input-area { 
+            padding: 20px; 
+            background: linear-gradient(to top, var(--bg), transparent);
+            padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
+        }
+
+        .input-container { 
+            background: var(--glass); 
+            border-radius: 25px; 
+            display: flex; 
+            padding: 5px 15px; 
+            align-items: center; 
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        input { 
+            flex: 1; 
+            background: transparent; 
+            border: none; 
+            color: white; 
+            padding: 12px; 
+            outline: none; 
+            font-size: 16px; 
+        }
+
+        button { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            width: 38px; 
+            height: 38px; 
+            border-radius: 50%; 
+            font-weight: bold; 
+            cursor: pointer;
+            transition: transform 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            transition: transform 0.2s;
         }
-
-        .send-btn:active { transform: scale(0.9); }
-
-        #status-bar {
-            font-size: 11px;
-            color: var(--accent);
-            margin-bottom: 8px;
-            padding-left: 20px;
-            display: none;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        button:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="brand">
-        <div class="logo-icon"></div>
-        <b>Nexus<span>Core</span></b>
-    </div>
+    <div class="brand">NEXUS<span>CORE</span></div>
     <select id="model-select">
-        <option value="G4-Ultra">Neural G4</option>
-        <option value="C3-Vision">Claude C3</option>
-        <option value="G-Pro">Gemini Pro</option>
+        <option value="Neural-G4">Neural G4</option>
+        <option value="Claude-V3">Claude V3</option>
+        <option value="Gemini-Pro">Gemini Pro</option>
     </select>
 </header>
 
-<div id="chat-window"></div>
+<div id="chat-window">
+    </div>
+
+<div id="loading-area" style="padding-left: 20px;">
+    <div class="typing-bubble">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <span style="font-size: 13px; color: #94a3b8; margin-left: 5px;">Pensando...</span>
+    </div>
+</div>
 
 <div class="input-area">
-    <div id="status-bar">Analizando con el núcleo...</div>
     <div class="input-container">
-        <input type="text" id="user-input" placeholder="Comando de sistema..." autocomplete="off">
-        <button class="send-btn" onclick="handleSend()">↑</button>
+        <input type="text" id="user-input" placeholder="Pregunta algo..." autocomplete="off">
+        <button onclick="handleSend()">↑</button>
     </div>
 </div>
 
 <script src="database.js"></script>
 <script src="brain.js"></script>
+
 <script>
     const chatWin = document.getElementById('chat-window');
-    const input = document.getElementById('user-input');
-    const status = document.getElementById('status-bar');
+    const inputField = document.getElementById('user-input');
+    const loadingArea = document.getElementById('loading-area');
 
-    let history = JSON.parse(localStorage.getItem('nexus_v2_chat')) || [
-        { role: 'bot', content: 'Protocolos de NexusCore v2.0 inicializados. Sistemas operativos al 100%.' }
-    ];
-
+    // Cargar historial al inicio
     function render() {
+        const history = JSON.parse(localStorage.getItem('nexus_pro_v2')) || [
+            { role: 'bot', content: 'Sistemas NexusCore activos. ¿En qué puedo ayudarte?' }
+        ];
         chatWin.innerHTML = '';
         history.forEach(m => {
             const d = document.createElement('div');
@@ -186,30 +220,50 @@
         chatWin.scrollTop = chatWin.scrollHeight;
     }
 
-    async function handleSend() {
-        const text = input.value.trim();
-        if(!text) return;
-
-        save('user', text);
-        input.value = '';
-        status.style.display = 'block';
-
-        // Lógica delegada al Cerebro
-        const response = await window.NexusBrain.analyze(text, document.getElementById('model-select').value);
-        
-        setTimeout(() => {
-            status.style.display = 'none';
-            save('bot', response);
-        }, 1200);
-    }
-
+    // Guardar en LocalStorage
     function save(role, content) {
+        const history = JSON.parse(localStorage.getItem('nexus_pro_v2')) || [];
         history.push({role, content});
-        localStorage.setItem('nexus_v2_chat', JSON.stringify(history));
+        localStorage.setItem('nexus_pro_v2', JSON.stringify(history));
         render();
     }
 
-    input.onkeypress = (e) => { if(e.key === 'Enter') handleSend() };
+    // Función principal para enviar
+    async function handleSend() {
+        const text = inputField.value.trim();
+        if(!text) return;
+
+        // Mostrar mensaje del usuario
+        save('user', text);
+        inputField.value = '';
+
+        // Mostrar animación de pensando
+        loadingArea.style.display = 'block';
+        chatWin.scrollTop = chatWin.scrollHeight;
+
+        // Llamar a brain.js (Asegúrate de que brain.js esté subido a GitHub)
+        if (window.NexusBrain) {
+            const model = document.getElementById('model-select').value;
+            const response = await window.NexusBrain.analyze(text, model);
+            
+            // Simular tiempo de "procesamiento"
+            setTimeout(() => {
+                loadingArea.style.display = 'none'; // Ocultar bolitas
+                save('bot', response); // Mostrar respuesta real
+            }, 1500);
+        } else {
+            // Si el archivo brain.js falló
+            setTimeout(() => {
+                loadingArea.style.display = 'none';
+                save('bot', "Error: No se pudo conectar con el núcleo lógico (brain.js no encontrado).");
+            }, 1000);
+        }
+    }
+
+    // Enviar con Enter
+    inputField.onkeypress = (e) => { if(e.key === 'Enter') handleSend() };
+
+    // Iniciar
     render();
 </script>
 </body>
